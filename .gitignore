@@ -1,0 +1,4 @@
+examples/quick-examples
+node_modules
+lib
+.DS_Store

@@ -1,0 +1,25 @@
+{
+  "name": "quickly-react",
+  "version": "0.1.1",
+  "description": "Quickly style react-native and reactjs components via props",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "./node_modules/.bin/tsc && cp package.json lib"
+  },
+  "keywords": [],
+  "author": "Le Quang Huy <lequanghuylc@gmail.com>",
+  "license": "ISC",
+  "dependencies": {},
+  "repository": "https://github.com/lequanghuylc/quickly-react",
+  "devDependencies": {
+    "@types/node": "^14.14.14",
+    "@types/react": "^17.0.0",
+    "@types/react-native": "^0.63.42",
+    "typescript": "^4.7.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
