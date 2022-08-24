@@ -114,7 +114,7 @@ class QuickComponent implements IQuickComponent {
     }
     // check if there's any un-parsed props
     for (let key in combinedProps.props) {
-      if (this.propsBank[key]) return this._combineProps(combinedProps);
+      if (this.propsBank[key] && combinedProps.props[key] === true) return this._combineProps(combinedProps);
     }
     return combinedProps;
   }
