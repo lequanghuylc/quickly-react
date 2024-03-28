@@ -126,9 +126,16 @@ export const useWindowWidthBreakpoint = (accepts : Array<TOneBreakpoint> = allBr
   }, 300, undefined);
 
   useEffect(() => {
-    Dimensions.addEventListener('change', updateBreakpoint);
+    const unsubcription = Dimensions.addEventListener('change', updateBreakpoint);
     return () => {
-      Dimensions.removeEventListener('change', updateBreakpoint);
+      if (typeof Dimensions.removeEventListener === 'function') {
+        Dimensions.removeEventListener('change', updateBreakpoint);
+      }
+      // @ts-ignore
+      else if (!!unsubcription && !!unsubcription.remove) {
+        // @ts-ignore
+        unsubcription.remove();
+      }
     };
   }, []);
   return breakpoint;
