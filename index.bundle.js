@@ -68,6 +68,27 @@ var useThemeContext = function () {
 };
 
 var Dimensions;
+var setDimensions = function (dep) {
+    if (!dep && typeof window !== 'undefined') {
+        Dimensions = {
+            get: function (type) {
+                return {
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                };
+            },
+            addEventListener: function (event, callback) {
+                window.addEventListener('resize', callback);
+            },
+            removeEventListener: function (event, callback) {
+                window.removeEventListener('resize', callback);
+            },
+        };
+    }
+    else {
+        Dimensions = dep;
+    }
+};
 
 var useRefState = function (initialValue) {
     var _a = React.useState(initialValue), value = _a[0], setValue = _a[1];
@@ -184,7 +205,9 @@ var useWindowWidthBreakpoint = function (accepts) {
     React.useEffect(function () {
         var unsubcription = Dimensions.addEventListener('change', updateBreakpoint);
         return function () {
-            if (typeof Dimensions.removeEventListener === 'function') ;
+            if (typeof Dimensions.removeEventListener === 'function') {
+                Dimensions.removeEventListener('change', updateBreakpoint);
+            }
             else if (!!unsubcription && !!unsubcription.remove) {
                 unsubcription.remove();
             }
@@ -408,6 +431,7 @@ var useResponsiveStyle = function (onResponsiveStyle) {
 
 exports.QuickComponent = QuickComponent;
 exports.ThemeProvider = ThemeProvider;
+exports.setDimensions = setDimensions;
 exports.useCombineStyle = useCombineStyle;
 exports.useDynamicResponsiveValue = useDynamicResponsiveValue;
 exports.usePropsStyle = usePropsStyle;
