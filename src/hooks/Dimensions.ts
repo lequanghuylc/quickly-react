@@ -1,22 +1,20 @@
 
-export let Dimensions : any;
-export  const setDimensions = (dep : any) => {
-    if (!dep && typeof window !== 'undefined') {
-       Dimensions = {
-        get: (type : any) => {
-            return {
-              width: window.innerWidth,
-              height: window.innerHeight,
-            };
-          },
-          addEventListener: (event: 'change', callback : any) => {
-            window.addEventListener('resize', callback);
-          },
-          removeEventListener: (event: 'change', callback : any) => {
-            window.removeEventListener('resize', callback);
-          },
-       }
-    } else {
-        Dimensions = dep;
-    }
+export let Dimensions = {
+  get: (type: any) => {
+    return {
+      width: typeof window === 'undefined' ? 0 : window.innerWidth,
+      height: typeof window === 'undefined' ? 0 : window.innerHeight,
+    };
+  },
+  addEventListener: (event: 'change', callback: any) => {
+    if (typeof window === 'undefined') return;
+    window.addEventListener('resize', callback);
+  },
+  removeEventListener: (event: 'change', callback: any) => {
+    if (typeof window === 'undefined') return;
+    window.removeEventListener('resize', callback);
+  },
+}
+export const setDimensions = (dep: any) => {
+  Dimensions = dep;
 }

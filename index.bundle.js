@@ -67,27 +67,26 @@ var useThemeContext = function () {
     return React.useContext(ThemeContext);
 };
 
-var Dimensions;
-var setDimensions = function (dep) {
-    if (!dep && typeof window !== 'undefined') {
-        Dimensions = {
-            get: function (type) {
-                return {
-                    width: window.innerWidth,
-                    height: window.innerHeight,
-                };
-            },
-            addEventListener: function (event, callback) {
-                window.addEventListener('resize', callback);
-            },
-            removeEventListener: function (event, callback) {
-                window.removeEventListener('resize', callback);
-            },
+var Dimensions = {
+    get: function (type) {
+        return {
+            width: typeof window === 'undefined' ? 0 : window.innerWidth,
+            height: typeof window === 'undefined' ? 0 : window.innerHeight,
         };
-    }
-    else {
-        Dimensions = dep;
-    }
+    },
+    addEventListener: function (event, callback) {
+        if (typeof window === 'undefined')
+            return;
+        window.addEventListener('resize', callback);
+    },
+    removeEventListener: function (event, callback) {
+        if (typeof window === 'undefined')
+            return;
+        window.removeEventListener('resize', callback);
+    },
+};
+var setDimensions = function (dep) {
+    Dimensions = dep;
 };
 
 var useRefState = function (initialValue) {
