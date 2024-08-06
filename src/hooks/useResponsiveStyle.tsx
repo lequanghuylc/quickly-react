@@ -1,13 +1,8 @@
 import React, { createContext } from 'react';
-import {
-  Dimensions,
-  TextStyle,
-  ViewStyle,
-  ImageStyle,
-} from 'react-native';
+import {  Dimensions } from './Dimensions';
 import { IResponsiveRule, TOneBreakpoint, useWindowWidthBreakpoint } from './useWindowWidthBreakpoint';
 
-type TOneStyle = TextStyle & ViewStyle & ImageStyle & any;
+type TOneStyle = any;
 
 export interface IResponsiveLayoutProps {
   responsiveLayout?: {

@@ -1,5 +1,5 @@
-import { Dimensions, Platform } from 'react-native';
-import { useEffect, useState, useRef } from 'react';
+import { Dimensions } from './Dimensions';
+import { useEffect } from 'react';
 import { useRefState } from '../hooks/useRefState'
 
 export interface IResponsiveRule<T> {

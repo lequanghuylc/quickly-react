@@ -68,6 +68,8 @@ var useThemeContext = function () {
     return React.useContext(ThemeContext);
 };
 
+var Dimensions;
+
 var useRefState = function (initialValue) {
     var _a = React.useState(initialValue), value = _a[0], setValue = _a[1];
     var valueRef = React.useRef(initialValue);
@@ -171,7 +173,7 @@ var useWindowWidthBreakpoint = function (accepts) {
         return obj;
     })();
     var measureBreakpointFromWidth = function () {
-        return getResponsiveRule(reactNative.Dimensions.get('window').width, ruleObject);
+        return getResponsiveRule(Dimensions.get('window').width, ruleObject);
     };
     var _a = useRefState(measureBreakpointFromWidth()), breakpoint = _a[0], getCurrentBreakpoint = _a[1], setBreakpoint = _a[2];
     var updateBreakpoint = throttle(function () {
@@ -181,11 +183,9 @@ var useWindowWidthBreakpoint = function (accepts) {
         }
     }, 300);
     React.useEffect(function () {
-        var unsubcription = reactNative.Dimensions.addEventListener('change', updateBreakpoint);
+        var unsubcription = Dimensions.addEventListener('change', updateBreakpoint);
         return function () {
-            if (typeof reactNative.Dimensions.removeEventListener === 'function') {
-                reactNative.Dimensions.removeEventListener('change', updateBreakpoint);
-            }
+            if (typeof Dimensions.removeEventListener === 'function') ;
             else if (!!unsubcription && !!unsubcription.remove) {
                 unsubcription.remove();
             }
@@ -372,7 +372,7 @@ var QuickComponent = (function () {
 }());
 
 React.createContext({
-    width: reactNative.Dimensions.get('window').width,
+    width: Dimensions.get('window').width,
     useCustomViewport: false,
 });
 var useDynamicResponsiveValue = function (accepts) {
