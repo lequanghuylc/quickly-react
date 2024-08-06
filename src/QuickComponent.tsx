@@ -1,5 +1,10 @@
 import React from 'react';
-import { useMemo } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+} from 'react-native';
 import { useCombineStyle } from './useCombineStyle';
 import { usePropsStyle } from './hooks/usePropsStyle';
 import {
@@ -32,6 +37,14 @@ type TSetupOptions = {
 }
 
 class QuickComponent implements IQuickComponent {
+
+  static styleDebug : {
+    [id: string]: {
+      combinedProps: any,
+      combineStyle: any,
+      lastChange: number,
+    }
+  } = {};
 
   propsBank : IStoreProps = {}
   defaultProps: TDefaultProps = {};
@@ -133,6 +146,29 @@ class QuickComponent implements IQuickComponent {
       const { theme, rStyle, style, props, computedStyle } = combinedProps;
       const propsStyle = !this.shouldDetectStyleProps ? {} : usePropsStyle(props);
       const combineStyle = useCombineStyle({ theme, rStyle, computedStyle, style, propsStyle });
+
+      // @ts-ignore
+      if (p.debugStyle && p.id) {
+        // @ts-ignore
+        const id = p.id;
+        // @ts-ignore
+        if (p.debugLog) {
+          console.log(`=== debug style id = ${id} ====`);
+          console.log('combinedProps', combinedProps);
+          console.log('combineStyle', combineStyle);
+          console.log(`=================================`);
+        }
+        
+        QuickComponent.styleDebug = {
+          ...QuickComponent.styleDebug,
+          [id]: {
+            combinedProps,
+            combineStyle,
+            lastChange: new Date().getTime(),
+          },
+        }
+      }
+
       return (
         <Comp
           style = {combineStyle}
@@ -142,6 +178,48 @@ class QuickComponent implements IQuickComponent {
     };
 
     return NewComp;
+  }
+
+  static DebugComponent = ({ id, style, scrollHeight } : { id: string, style: any, scrollHeight?: number }) => {
+
+    const timeRef = useRef(0);
+    const [data, setData] = useState({
+      combinedProps: {},
+      combineStyle: {},
+    });
+
+    useEffect(() => {
+      const interval = setInterval(() => {
+        const debugData = QuickComponent.styleDebug[id];
+        if (!debugData) return;
+        if (timeRef.current === debugData.lastChange) return;
+        timeRef.current = debugData.lastChange;
+        setData({
+          combinedProps: debugData.combinedProps,
+          combineStyle: debugData.combineStyle,
+        });
+      }, 500);
+
+      return () => {
+        clearInterval(interval);
+      }
+    }, []);
+
+    return (
+      <View style={style}>
+        <Text>Debug style props for component Id: {id}</Text>
+        <ScrollView
+          style={{
+            height: scrollHeight || '100%',
+          }}
+          contentContainerStyle={{
+            padding: 10,
+          }}
+        >
+          <Text>{JSON.stringify(data, undefined, 4)}</Text>
+        </ScrollView>
+      </View>
+    );
   }
 }
 

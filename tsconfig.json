@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "./lib",
     "target": "es5",
-    "module": "commonjs",
+    "module": "esnext",
     "noImplicitAny": true,
     "strictNullChecks": true,
     "removeComments": true,
