@@ -1,11 +1,6 @@
-
-import {
-  TextStyle, ViewStyle,ImageStyle,
-} from 'react-native';
-
 export { IProps as IStyleProps } from './hooks/usePropsStyle';
-export type TOneStyle = TextStyle & ViewStyle & ImageStyle & any;
-export type TStyle = TextStyle & ViewStyle & ImageStyle
+export type TOneStyle =  any;
+export type TStyle = any;
 export type TReactComponent = any
 
 export interface IAddProps {

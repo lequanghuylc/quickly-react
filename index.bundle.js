@@ -1,7 +1,6 @@
 'use strict';
 
 var React = require('react');
-var reactNative = require('react-native');
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -333,7 +332,7 @@ var QuickComponent = (function () {
         return NewComp;
     };
     QuickComponent.styleDebug = {};
-    QuickComponent.DebugComponent = function (_a) {
+    QuickComponent.makeDebugComponentRN = function (View, Text, ScrollView) { return function (_a) {
         var id = _a.id, style = _a.style, scrollHeight = _a.scrollHeight;
         var timeRef = React.useRef(0);
         var _b = React.useState({
@@ -357,17 +356,17 @@ var QuickComponent = (function () {
                 clearInterval(interval);
             };
         }, []);
-        return (React.createElement(reactNative.View, { style: style },
-            React.createElement(reactNative.Text, null,
+        return (React.createElement(View, { style: style },
+            React.createElement(Text, null,
                 "Debug style props for component Id: ",
                 id),
-            React.createElement(reactNative.ScrollView, { style: {
+            React.createElement(ScrollView, { style: {
                     height: scrollHeight || '100%',
                 }, contentContainerStyle: {
                     padding: 10,
                 } },
-                React.createElement(reactNative.Text, null, JSON.stringify(data, undefined, 4)))));
-    };
+                React.createElement(Text, null, JSON.stringify(data, undefined, 4)))));
+    }; };
     return QuickComponent;
 }());
 

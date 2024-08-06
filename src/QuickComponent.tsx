@@ -1,10 +1,5 @@
 import React from 'react';
 import { useMemo, useRef, useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-} from 'react-native';
 import { useCombineStyle } from './useCombineStyle';
 import { usePropsStyle } from './hooks/usePropsStyle';
 import {
@@ -180,7 +175,7 @@ class QuickComponent implements IQuickComponent {
     return NewComp;
   }
 
-  static DebugComponent = ({ id, style, scrollHeight } : { id: string, style: any, scrollHeight?: number }) => {
+  static makeDebugComponentRN = (View: any, Text: any, ScrollView: any) => ({ id, style, scrollHeight } : { id: string, style: any, scrollHeight?: number }) => {
 
     const timeRef = useRef(0);
     const [data, setData] = useState({

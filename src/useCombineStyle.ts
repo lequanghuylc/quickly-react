@@ -1,7 +1,5 @@
 import { IAddProps, IAddPropsArray, TStyle } from './types';
 import { useThemeContext } from './hooks/ThemeContext';
-import { useResponsiveStyle } from './hooks/useResponsiveStyle';
-import { useWindowDimensions } from 'react-native';
 import { useWindowWidthBreakpoint } from './hooks/useWindowWidthBreakpoint';
 
 interface IUseCompbineStyle {
