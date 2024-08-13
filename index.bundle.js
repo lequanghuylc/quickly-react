@@ -122,7 +122,7 @@ var getResponsiveRule = function (viewportWidth, rules) {
             continue;
         if (!customBreakpoint.includes('px'))
             continue;
-        var breakpointWidth = +customBreakpoint.replace('c-', '');
+        var breakpointWidth = +customBreakpoint.replace('px', '');
         if (isNaN(breakpointWidth))
             continue;
         minWidthBreakpoints[customBreakpoint] = breakpointWidth;
@@ -173,8 +173,28 @@ function throttle(fn, threshhold, scope) {
 }
 var useWindowWidthBreakpoint = function (accepts) {
     if (accepts === void 0) { accepts = allBreakpoints; }
-    var ruleObject = accepts;
+    var ruleObject = (function () {
+        var allRule = {
+            xs: 'xs',
+            sm: 'sm',
+            md: 'md',
+            lg: 'lg',
+            xl: 'xl',
+            xxl: 'xxl',
+            xxxl: 'xxxl',
+        };
+        var obj = {};
+        accepts.forEach(function (key) {
+            if (!!allRule[key] || key.includes('px')) {
+                obj[key] = key;
+            }
+        });
+        return obj;
+    })();
     var measureBreakpointFromWidth = function () {
+        var currentWindowWidth = Dimensions.get('window').width;
+        if (accepts.length === 0)
+            return "c-".concat(currentWindowWidth);
         return getResponsiveRule(Dimensions.get('window').width, ruleObject);
     };
     var _a = useRefState(measureBreakpointFromWidth()), breakpoint = _a[0], getCurrentBreakpoint = _a[1], setBreakpoint = _a[2];
@@ -428,6 +448,7 @@ var useResponsiveStyle = function (onResponsiveStyle) {
 };
 
 var useContainer = function (Component, accepts) {
+    if (accepts === void 0) { accepts = []; }
     var sizeRef = React.useRef({ width: 0, height: 0 });
     var _a = React.useState({ width: 0, height: 0 }), size = _a[0], setSize = _a[1];
     var breakpoint = useWindowWidthBreakpoint(accepts);
@@ -438,11 +459,15 @@ var useContainer = function (Component, accepts) {
         return function (p) {
             return (React.createElement(Component, __assign({}, p, { onLayout: function (e) {
                     var _a = e.nativeEvent.layout, width = _a.width, height = _a.height;
+                    var isFirstTime = sizeRef.current.width === 0 && sizeRef.current.height === 0;
                     sizeRef.current = { width: width, height: height };
+                    if (isFirstTime) {
+                        setSize(sizeRef.current);
+                    }
                 } })));
         };
     }, []);
-    return { Container: Container, size: size };
+    return [Container, size];
 };
 
 exports.QuickComponent = QuickComponent;

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { useWindowWidthBreakpoint } from './useWindowWidthBreakpoint';
+import { TOneBreakpoint, useWindowWidthBreakpoint } from './useWindowWidthBreakpoint';
 
-export const useContainer = (Component : any, accepts : any) => {
+export const useContainer = (Component: any, accepts: Array<TOneBreakpoint> = []) => {
     const sizeRef = useRef({ width: 0, height: 0 });
     const [size, setSize] = useState({ width: 0, height: 0 });
     const breakpoint = useWindowWidthBreakpoint(accepts);
@@ -10,18 +10,22 @@ export const useContainer = (Component : any, accepts : any) => {
         setSize(sizeRef.current);
     }, [breakpoint]);
 
-    const Container = useMemo(() => {
-        return (p : any) => {
+    const Container = useMemo<any>(() => {
+        return (p: any) => {
             return (
                 <Component
                     {...p}
-                    onLayout={(e : any) => {
+                    onLayout={(e: any) => {
                         const { width, height } = e.nativeEvent.layout;
+                        const isFirstTime = sizeRef.current.width === 0 && sizeRef.current.height === 0;
                         sizeRef.current = { width, height };
+                        if (isFirstTime) {
+                            setSize(sizeRef.current);
+                        }
                     }}
                 />
             );
         };
     }, []);
-    return { Container, size };
+    return [Container, size];
 }

@@ -32,7 +32,7 @@ export const getResponsiveRule : IGetResponsiveRule<any> = (viewportWidth, rules
     for (let customBreakpoint in rules) {
       if (typeof minWidthBreakpoints[customBreakpoint] === 'number') continue;
       if (!customBreakpoint.includes('px')) continue; // skip invalid breakpoint
-      const breakpointWidth = +customBreakpoint.replace('c-', '');
+      const breakpointWidth = +customBreakpoint.replace('px', '');
       if (isNaN(breakpointWidth)) continue; // skip invalid breakpoint
       minWidthBreakpoints[customBreakpoint] = breakpointWidth;
     }
@@ -93,27 +93,28 @@ function throttle(fn, threshhold, scope) {
 }
 
 export const useWindowWidthBreakpoint = (accepts : Array<TOneBreakpoint> = allBreakpoints) : TOneBreakpoint => {
-  // const ruleObject = (() => {
-  //   const allRule : IResponsiveRule<TOneBreakpoint> = {
-  //     xs: 'xs',
-  //     sm: 'sm',
-  //     md: 'md',
-  //     lg: 'lg',
-  //     xl: 'xl',
-  //     xxl: 'xxl',
-  //     xxxl: 'xxxl',
-  //   };
-  //   const obj : IResponsiveRule<TOneBreakpoint> = {};
-  //   for ( let key in allRule ) {
-  //     if (!!accepts.includes(key as TOneBreakpoint)) {
-  //       obj[key] = allRule[key];
-  //     }
-  //   }
-  //   return obj;
-  // })();
-  const ruleObject = accepts;
+  const ruleObject = (() => {
+    const allRule : IResponsiveRule<TOneBreakpoint> = {
+      xs: 'xs',
+      sm: 'sm',
+      md: 'md',
+      lg: 'lg',
+      xl: 'xl',
+      xxl: 'xxl',
+      xxxl: 'xxxl',
+    };
+    const obj : IResponsiveRule<TOneBreakpoint> = {};
+    accepts.forEach(key => {
+      if (!!allRule[key] || key.includes('px')) {
+        obj[key] = key;
+      }
+    });
+    return obj;
+  })();
 
   const measureBreakpointFromWidth = () => {
+    const currentWindowWidth = Dimensions.get('window').width;
+    if (accepts.length === 0) return `c-${currentWindowWidth}`;
     return getResponsiveRule(Dimensions.get('window').width, ruleObject);
   }
 
