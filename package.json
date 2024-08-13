@@ -1,6 +1,6 @@
 {
   "name": "quickly-react",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "Quickly style react-native and reactjs components via props",
   "main": "index.bundle.js",
   "types": "lib/index.d.ts",

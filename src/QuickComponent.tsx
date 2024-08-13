@@ -148,10 +148,10 @@ class QuickComponent implements IQuickComponent {
         const id = p.id;
         // @ts-ignore
         if (p.debugLog) {
-          console.log(`=== debug style id = ${id} ====`);
+          console.group(`debug style id = ${id}`);
           console.log('combinedProps', combinedProps);
           console.log('combineStyle', combineStyle);
-          console.log(`=================================`);
+          console.groupEnd();
         }
         
         QuickComponent.styleDebug = {
@@ -190,7 +190,13 @@ class QuickComponent implements IQuickComponent {
         if (timeRef.current === debugData.lastChange) return;
         timeRef.current = debugData.lastChange;
         setData({
-          combinedProps: debugData.combinedProps,
+          combinedProps: {
+            ...debugData.combinedProps,
+            props: {
+              ...debugData.combinedProps.props,
+              children: '...',
+            }
+          },
           combineStyle: debugData.combineStyle,
         });
       }, 500);
@@ -199,6 +205,25 @@ class QuickComponent implements IQuickComponent {
         clearInterval(interval);
       }
     }, []);
+
+    const stringify = () => {
+      // go through data and remove function and circular reference
+      const getCircularReplacer = () => {
+        const seen = new WeakSet();
+        // @ts-ignore
+        return (key, value) => {
+          if (typeof value === "object" && value !== null) {
+            if (seen.has(value)) {
+              return;
+            }
+            seen.add(value);
+          }
+          return value;
+        };
+      };
+      const dataString = JSON.stringify(data, getCircularReplacer(), 2);
+      return dataString;
+    }
 
     return (
       <View style={style}>
@@ -211,7 +236,7 @@ class QuickComponent implements IQuickComponent {
             padding: 10,
           }}
         >
-          <Text>{JSON.stringify(data, undefined, 4)}</Text>
+          <Text>{stringify()}</Text>
         </ScrollView>
       </View>
     );

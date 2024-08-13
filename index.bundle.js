@@ -122,7 +122,7 @@ var getResponsiveRule = function (viewportWidth, rules) {
             continue;
         if (!customBreakpoint.includes('px'))
             continue;
-        var breakpointWidth = +customBreakpoint.replace('px', '');
+        var breakpointWidth = +customBreakpoint.replace('c-', '');
         if (isNaN(breakpointWidth))
             continue;
         minWidthBreakpoints[customBreakpoint] = breakpointWidth;
@@ -173,24 +173,7 @@ function throttle(fn, threshhold, scope) {
 }
 var useWindowWidthBreakpoint = function (accepts) {
     if (accepts === void 0) { accepts = allBreakpoints; }
-    var ruleObject = (function () {
-        var allRule = {
-            xs: 'xs',
-            sm: 'sm',
-            md: 'md',
-            lg: 'lg',
-            xl: 'xl',
-            xxl: 'xxl',
-            xxxl: 'xxxl',
-        };
-        var obj = {};
-        for (var key in allRule) {
-            if (!!accepts.includes(key)) {
-                obj[key] = allRule[key];
-            }
-        }
-        return obj;
-    })();
+    var ruleObject = accepts;
     var measureBreakpointFromWidth = function () {
         return getResponsiveRule(Dimensions.get('window').width, ruleObject);
     };
@@ -229,7 +212,7 @@ var useCombineStyle = function (_a) {
     return allStyle;
 };
 
-var styleProperties = ['alignContent', 'alignItems', 'alignSelf', 'aspectRatio', 'backfaceVisibility', 'backgroundColor', 'borderBottomColor', 'borderBottomLeftRadius', 'borderBottomRightRadius', 'borderBottomWidth', 'borderColor', 'borderLeftColor', 'borderLeftWidth', 'borderRadius', 'borderRightColor', 'borderRightWidth', 'borderStyle', 'borderTopColor', 'borderTopLeftRadius', 'borderTopRightRadius', 'borderTopWidth', 'borderWidth', 'bottom', 'color', 'decomposedMatrix', 'direction', 'display', 'elevation', 'flex', 'flexBasis', 'flexDirection', 'flexGrow', 'flexShrink', 'flexWrap', 'fontFamily', 'fontSize', 'fontStyle', 'fontVariant', 'fontWeight', 'height', 'includeFontPadding', 'justifyContent', 'left', 'letterSpacing', 'lineHeight', 'margin', 'marginBottom', 'marginHorizontal', 'marginLeft', 'marginRight', 'marginTop', 'marginVertical', 'maxHeight', 'maxWidth', 'minHeight', 'minWidth', 'opacity', 'overflow', 'overlayColor', 'padding', 'paddingBottom', 'paddingHorizontal', 'paddingLeft', 'paddingRight', 'paddingTop', 'paddingVertical', 'position', 'right', 'rotation', 'scaleX', 'scaleY', 'shadowColor', 'shadowOffset', 'shadowOpacity', 'shadowRadius', 'textAlign', 'textAlignVertical', 'textDecorationColor', 'textDecorationLine', 'textDecorationStyle', 'textShadowColor', 'textShadowOffset', 'textShadowRadius', 'tintColor', 'top', 'transform', 'transformMatrix', 'translateX', 'translateY', 'width', 'writingDirection', 'zIndex'];
+var styleProperties = ['alignContent', 'alignItems', 'alignSelf', 'aspectRatio', 'backfaceVisibility', 'backgroundColor', 'borderBottomColor', 'borderBottomLeftRadius', 'borderBottomRightRadius', 'borderBottomWidth', 'borderColor', 'borderLeftColor', 'borderLeftWidth', 'borderRadius', 'borderRightColor', 'borderRightWidth', 'borderStyle', 'borderTopColor', 'borderTopLeftRadius', 'borderTopRightRadius', 'borderTopWidth', 'borderWidth', 'bottom', 'color', 'decomposedMatrix', 'direction', 'display', 'elevation', 'flex', 'flexBasis', 'flexDirection', 'flexGrow', 'flexShrink', 'flexWrap', 'fontFamily', 'fontSize', 'fontStyle', 'fontVariant', 'fontWeight', 'height', 'includeFontPadding', 'justifyContent', 'left', 'letterSpacing', 'lineHeight', 'margin', 'marginBottom', 'marginHorizontal', 'marginLeft', 'marginRight', 'marginTop', 'marginVertical', 'maxHeight', 'maxWidth', 'minHeight', 'minWidth', 'opacity', 'overflow', 'overlayColor', 'padding', 'paddingBottom', 'paddingHorizontal', 'paddingLeft', 'paddingRight', 'paddingTop', 'paddingVertical', 'position', 'right', 'rotation', 'scaleX', 'scaleY', 'shadowColor', 'shadowOffset', 'shadowOpacity', 'shadowRadius', 'textAlign', 'textAlignVertical', 'textDecorationColor', 'textDecorationLine', 'textDecorationStyle', 'textShadowColor', 'textShadowOffset', 'textShadowRadius', 'tintColor', 'top', 'transform', 'transformMatrix', 'translateX', 'translateY', 'width', 'writingDirection', 'zIndex', 'gap', 'rowGap', 'columnGap'];
 var hasNumber = function (myString) {
     return /\d/.test(myString);
 };
@@ -338,10 +321,10 @@ var QuickComponent = (function () {
             if (p.debugStyle && p.id) {
                 var id = p.id;
                 if (p.debugLog) {
-                    console.log("=== debug style id = ".concat(id, " ===="));
+                    console.group("debug style id = ".concat(id));
                     console.log('combinedProps', combinedProps);
                     console.log('combineStyle', combineStyle);
-                    console.log("=================================");
+                    console.groupEnd();
                 }
                 QuickComponent.styleDebug = __assign(__assign({}, QuickComponent.styleDebug), (_a = {}, _a[id] = {
                     combinedProps: combinedProps,
@@ -370,7 +353,7 @@ var QuickComponent = (function () {
                     return;
                 timeRef.current = debugData.lastChange;
                 setData({
-                    combinedProps: debugData.combinedProps,
+                    combinedProps: __assign(__assign({}, debugData.combinedProps), { props: __assign(__assign({}, debugData.combinedProps.props), { children: '...' }) }),
                     combineStyle: debugData.combineStyle,
                 });
             }, 500);
@@ -378,6 +361,22 @@ var QuickComponent = (function () {
                 clearInterval(interval);
             };
         }, []);
+        var stringify = function () {
+            var getCircularReplacer = function () {
+                var seen = new WeakSet();
+                return function (key, value) {
+                    if (typeof value === "object" && value !== null) {
+                        if (seen.has(value)) {
+                            return;
+                        }
+                        seen.add(value);
+                    }
+                    return value;
+                };
+            };
+            var dataString = JSON.stringify(data, getCircularReplacer(), 2);
+            return dataString;
+        };
         return (React.createElement(View, { style: style },
             React.createElement(Text, null,
                 "Debug style props for component Id: ",
@@ -387,7 +386,7 @@ var QuickComponent = (function () {
                 }, contentContainerStyle: {
                     padding: 10,
                 } },
-                React.createElement(Text, null, JSON.stringify(data, undefined, 4)))));
+                React.createElement(Text, null, stringify()))));
     }; };
     return QuickComponent;
 }());
@@ -428,10 +427,29 @@ var useResponsiveStyle = function (onResponsiveStyle) {
     return findNearestLowerBreakpointValue(breakpoint, onResponsiveStyle);
 };
 
+var useContainer = function (Component, accepts) {
+    var sizeRef = React.useRef({ width: 0, height: 0 });
+    var _a = React.useState({ width: 0, height: 0 }), size = _a[0], setSize = _a[1];
+    var breakpoint = useWindowWidthBreakpoint(accepts);
+    React.useEffect(function () {
+        setSize(sizeRef.current);
+    }, [breakpoint]);
+    var Container = React.useMemo(function () {
+        return function (p) {
+            return (React.createElement(Component, __assign({}, p, { onLayout: function (e) {
+                    var _a = e.nativeEvent.layout, width = _a.width, height = _a.height;
+                    sizeRef.current = { width: width, height: height };
+                } })));
+        };
+    }, []);
+    return { Container: Container, size: size };
+};
+
 exports.QuickComponent = QuickComponent;
 exports.ThemeProvider = ThemeProvider;
 exports.setDimensions = setDimensions;
 exports.useCombineStyle = useCombineStyle;
+exports.useContainer = useContainer;
 exports.useDynamicResponsiveValue = useDynamicResponsiveValue;
 exports.usePropsStyle = usePropsStyle;
 exports.useResponsiveStyle = useResponsiveStyle;
