@@ -1,6 +1,7 @@
 import React from 'react';
 import { createPressable, type IPressableViewProps } from './createPressable';
 import { createText } from './createText';
+import { addCommonStyles, type ITokens, type ICommonStyle } from './addCommonStyles';
 
 type TAddPropsParam = Array<{
     propName: string,
@@ -8,8 +9,20 @@ type TAddPropsParam = Array<{
     isDefault: boolean,
 }>;
 
-export const createBase = <TCol, TRow, TText>(RN: any, addTextProps : TAddPropsParam, commonStyles: any) => {
-    const Col = createPressable<TCol>(RN, [], commonStyles);
+interface ICreateBaseOptions {
+    RN: any,
+    addTextProps: TAddPropsParam,
+    commonStyles: ICommonStyle,
+    tokens: ITokens,
+}
+
+export const createBase = <TCol, TRow, TText>({ RN, addTextProps, commonStyles, tokens } : ICreateBaseOptions) => {
+
+    const addCommonStylesCombined = (quickComponentInstance: any) => {
+        addCommonStyles(quickComponentInstance, [commonStyles], tokens);
+    }
+
+    const Col = createPressable<TCol>(RN, [], addCommonStylesCombined);
 
     const Row = createPressable<TRow>(RN, [
         {
@@ -18,7 +31,7 @@ export const createBase = <TCol, TRow, TText>(RN: any, addTextProps : TAddPropsP
                 alignItems: 'center',
             }, isDefault: true
         },
-    ], commonStyles);
+    ], addCommonStylesCombined);
 
     interface IRatioColProps {
         ratio: number, // width / height
@@ -39,7 +52,7 @@ export const createBase = <TCol, TRow, TText>(RN: any, addTextProps : TAddPropsP
         );
     };
 
-    const Text = createText<TText>(RN, addTextProps, commonStyles);
+    const Text = createText<TText>(RN, addTextProps, addCommonStylesCombined);
 
     return {
         Col,
