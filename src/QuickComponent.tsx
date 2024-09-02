@@ -70,7 +70,7 @@ class QuickComponent implements IQuickComponent {
       computedStyle: Object.assign({}, p.computedStyle),
       // support both reactjs and react-native style: object and array
       style: Array.isArray(p.style) ?  p.style.slice() : Object.assign({}, p.style),
-      rStyle: Object.assign({}, p.rStyle),
+      rStyle: Object.assign({}, p.rStyle, p.props.rStyle),
       props: Object.assign({}, {
         ...this.defaultProps,
         ...p.props,

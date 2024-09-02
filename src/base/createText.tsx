@@ -4,10 +4,15 @@ import QuickComponent from "../QuickComponent";
 type TAddPropsParam = Array<{
     propName: string,
     obj: any,
-    isDefault: boolean,
+    isDefault?: boolean,
 }>;
 
-export const createText = <T,>(RN : any, addProps : TAddPropsParam = [], addCommonStyle?: any) : React.FC<T & any> => {
+export const createText = <T,>(RN : any, addProps : TAddPropsParam = [], addCommonStyle?: any) => {
+    
+    interface IText {
+        (props: T): any;
+    }
+    
     const quickComponent = new QuickComponent();
     const defaultProps : any = [];
     addProps.forEach(({ propName, obj, isDefault }) => {
@@ -19,6 +24,6 @@ export const createText = <T,>(RN : any, addProps : TAddPropsParam = [], addComm
     });
     !!addCommonStyle && addCommonStyle(quickComponent);
     const { Text : RNText } = RN;
-    const Text = quickComponent.make(RNText);
+    const Text : IText = quickComponent.make(RNText);
     return Text;
 };

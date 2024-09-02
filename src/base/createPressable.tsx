@@ -1,5 +1,6 @@
 import React from "react";
 import QuickComponent from "../QuickComponent";
+import { useContainer } from "../index";
 
 export interface IPressableViewProps {
     onPress?: () => any;
@@ -8,16 +9,22 @@ export interface IPressableViewProps {
     style?: any;
     children?: any;
     onLayout?: any;
+    container?: boolean;
     [otherProps: string]: any;
 }
 
 type TAddPropsParam = Array<{
     propName: string,
     obj: any,
-    isDefault: boolean,
+    isDefault?: boolean,
 }>;
 
-export const createPressable = <T,>(RN : any, addProps : TAddPropsParam = [], addCommonStyle?: any) : React.FC<T & IPressableViewProps & any> => {
+export const createPressable = <T,>(RN : any, addProps : TAddPropsParam = [], addCommonStyle?: any) => {
+    
+    interface IPressable {
+        (props: T & IPressableViewProps): any;
+    }
+
     const quickComponent = new QuickComponent();
     const defaultProps : any = [];
     addProps.forEach(({ propName, obj, isDefault }) => {
@@ -29,6 +36,7 @@ export const createPressable = <T,>(RN : any, addProps : TAddPropsParam = [], ad
     });
     !!addCommonStyle && addCommonStyle(quickComponent);
     const { View, TouchableOpacity, Pressable } = RN;
+
     const PressabelComponent = (props: IPressableViewProps) => {
         return !props.onPress ? <View ref={props.onRef} {...props} /> : (
             Pressable ? (
@@ -48,6 +56,21 @@ export const createPressable = <T,>(RN : any, addProps : TAddPropsParam = [], ad
             ) : <TouchableOpacity ref={props.onRef} activeOpacity={0.9} {...props} />
         )
     };
-    const PressableView = quickComponent.make(PressabelComponent);
-    return PressableView;
+    const PressableView : IPressable = quickComponent.make(PressabelComponent);
+
+    const PressableContainer : IPressable = ({ container, ...props }: IPressableViewProps) => {
+        const [Container] = useContainer(PressableView);
+        return (
+            <Container {...props} />
+        );
+    }
+
+    const PressableViewWithContainerQuery : IPressable = ({ container, ...props }: IPressableViewProps) => {
+        return !container ? (
+            <PressableView {...props} />
+        ) : (
+            <PressableContainer {...props} />
+        );
+    }
+    return PressableViewWithContainerQuery;
 };

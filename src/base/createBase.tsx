@@ -1,12 +1,13 @@
 import React from 'react';
 import { createPressable, type IPressableViewProps } from './createPressable';
 import { createText } from './createText';
-import { addCommonStyles, type ITokens, type ICommonStyle } from './addCommonStyles';
+import { addCommonStyles, type ITokens, type ICommonStyle, type TCommonPropStyle } from './addCommonStyles';
+import { createGrid, type IGridProps } from './createGrid';
 
 type TAddPropsParam = Array<{
     propName: string,
     obj: any,
-    isDefault: boolean,
+    isDefault?: boolean,
 }>;
 
 interface ICreateBaseOptions {
@@ -22,14 +23,16 @@ export const createBase = <TCol, TRow, TText>({ RN, addTextProps, commonStyles, 
         addCommonStyles(quickComponentInstance, [commonStyles], tokens);
     }
 
-    const Col = createPressable<TCol>(RN, [], addCommonStylesCombined);
+    const Col = createPressable<TCol & TCommonPropStyle>(RN, [], addCommonStylesCombined);
 
-    const Row = createPressable<TRow>(RN, [
+    const Row = createPressable<TRow & TCommonPropStyle>(RN, [
         {
-            propName: 'defaultRow', obj: {
+            propName: 'defaultRow',
+            obj: {
                 flexDirection: 'row',
                 alignItems: 'center',
-            }, isDefault: true
+            },
+            isDefault: true
         },
     ], addCommonStylesCombined);
 
@@ -40,7 +43,7 @@ export const createBase = <TCol, TRow, TText>({ RN, addTextProps, commonStyles, 
         [otherProps: string]: any,
     }
 
-    const RatioCol: React.FC<IRatioColProps & TCol & any> = ({ ratio, children, width, ...props }) => {
+    const RatioCol = ({ ratio, children, width, ...props } : IRatioColProps & TCol & any) => {
         return (
             <Col width={width} {...props}>
                 <Col paddingBottom={100 / ratio + '%'}>
@@ -52,12 +55,15 @@ export const createBase = <TCol, TRow, TText>({ RN, addTextProps, commonStyles, 
         );
     };
 
-    const Text = createText<TText>(RN, addTextProps, addCommonStylesCombined);
+    const Text = createText<TText & TCommonPropStyle>(RN, addTextProps, addCommonStylesCombined);
+
+    const Grid = createGrid<TRow & TCommonPropStyle>(Col, Row);
 
     return {
         Col,
         Row,
         RatioCol,
         Text,
+        Grid,
     }
 }

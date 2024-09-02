@@ -5,5 +5,6 @@ export { useWindowWidthBreakpoint, TOneBreakpoint, IResponsiveRule } from './hoo
 export { useCombineStyle } from './useCombineStyle';
 export { ThemeProvider, useThemeContext } from './hooks/ThemeContext';
 export { setDimensions } from './hooks/Dimensions';
-export { useContainer } from './hooks/useContainer';
+export { useContainer, useContainerContext } from './hooks/useContainer';
 export { IStyleProps, TStyle, IAddProps } from './types';
+export * from './base/index';

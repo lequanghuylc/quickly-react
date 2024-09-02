@@ -25,9 +25,9 @@ export const useCombineStyle = ({ theme, rStyle, computedStyle, style, propsStyl
     ...style,
   ] : {
     ...(theme ? theme[currentTheme] : {}),
-    ...responsiveStyle,
     ...computedStyle,
     ...propsStyle,
+    ...responsiveStyle,
     ...style,
   };
   return allStyle;
