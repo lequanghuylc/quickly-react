@@ -736,8 +736,10 @@ var createBase = function (_a) {
         {
             propName: 'defaultRow',
             obj: {
-                flexDirection: 'row',
-                alignItems: 'center',
+                style: {
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                },
             },
             isDefault: true
         },

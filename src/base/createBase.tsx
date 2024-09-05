@@ -29,8 +29,10 @@ export const createBase = <TCol, TRow, TText>({ RN, addTextProps, commonStyles, 
         {
             propName: 'defaultRow',
             obj: {
-                flexDirection: 'row',
-                alignItems: 'center',
+                style: {
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                },
             },
             isDefault: true
         },
