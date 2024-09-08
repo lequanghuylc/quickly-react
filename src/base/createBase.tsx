@@ -13,17 +13,18 @@ type TAddPropsParam = Array<{
 interface ICreateBaseOptions {
     RN: any,
     addTextProps: TAddPropsParam,
+    addViewProps: TAddPropsParam,
     commonStyles: ICommonStyle,
     tokens: ITokens,
 }
 
-export const createBase = <TCol, TRow, TText>({ RN, addTextProps, commonStyles, tokens } : ICreateBaseOptions) => {
+export const createBase = <TCol, TRow, TText>({ RN, addTextProps = [], addViewProps = [], commonStyles, tokens } : ICreateBaseOptions) => {
 
     const addCommonStylesCombined = (quickComponentInstance: any) => {
         addCommonStyles(quickComponentInstance, [commonStyles], tokens);
     }
 
-    const Col = createPressable<TCol & TCommonPropStyle>(RN, [], addCommonStylesCombined);
+    const Col = createPressable<TCol & TCommonPropStyle>(RN, addViewProps, addCommonStylesCombined);
 
     const Row = createPressable<TRow & TCommonPropStyle>(RN, [
         {
