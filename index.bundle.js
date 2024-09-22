@@ -748,7 +748,7 @@ var createBase = function (_a) {
         var ratio = _a.ratio, children = _a.children, width = _a.width, props = __rest(_a, ["ratio", "children", "width"]);
         return (React.createElement(Col, __assign({ width: width }, props),
             React.createElement(Col, { paddingBottom: 100 / ratio + '%' },
-                React.createElement(Col, { position: "absolute", top: 0, left: 0, right: 9, bottom: 0 }, children))));
+                React.createElement(Col, { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }, children))));
     };
     var Text = createText(RN, addTextProps, addCommonStylesCombined);
     var Grid = createGrid(Col, Row);

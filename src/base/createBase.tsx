@@ -50,7 +50,7 @@ export const createBase = <TCol, TRow, TText>({ RN, addTextProps = [], addViewPr
         return (
             <Col width={width} {...props}>
                 <Col paddingBottom={100 / ratio + '%'}>
-                    <Col position="absolute" top={0} left={0} right={9} bottom={0}>
+                    <Col position="absolute" top={0} left={0} right={0} bottom={0}>
                         {children}
                     </Col>
                 </Col>
