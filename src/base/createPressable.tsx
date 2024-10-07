@@ -45,11 +45,11 @@ export const createPressable = <T,>(RN : any, addProps : TAddPropsParam = [], ad
                     {...props}
                     style={({ pressed } : any) => {
                         return [
+                            ...(Array.isArray(props.style) ? props.style : [props.style]),
                             ...(!pressed ? [] : [
                                 { opacity: pressed ? 0.9 : 1 },
                                 ...(Array.isArray(props.pressedStyle) ? props.pressedStyle : [props.pressedStyle]),
                             ]),
-                            ...(Array.isArray(props.style) ? props.style : [props.style]),
                         ]
                     }}
                 />
