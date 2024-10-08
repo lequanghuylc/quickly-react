@@ -128,6 +128,13 @@ export const useWindowWidthBreakpoint = (accepts : Array<TOneBreakpoint> = allBr
   }, 300, undefined);
 
   useEffect(() => {
+    if (!forceInitial) return;
+    // this is a fix for nextjs, it requires the server and client to have the same initial value
+    // but we need to re-calculate the breakpoint on the client side
+    updateBreakpoint();
+  }, [forceInitial])
+
+  useEffect(() => {
     if (accepts.length === 0) return;
     const unsubcription = Dimensions.addEventListener('change', updateBreakpoint);
     return () => {
