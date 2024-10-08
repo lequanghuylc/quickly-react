@@ -205,6 +205,11 @@ var useWindowWidthBreakpoint = function (accepts, forceInitial) {
         }
     }, 300);
     React.useEffect(function () {
+        if (!forceInitial)
+            return;
+        updateBreakpoint();
+    }, [forceInitial]);
+    React.useEffect(function () {
         if (accepts.length === 0)
             return;
         var unsubcription = Dimensions.addEventListener('change', updateBreakpoint);
