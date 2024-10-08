@@ -10,12 +10,36 @@ interface IUseCompbineStyle {
   propsStyle?: TStyle,
 }
 
+const findInitial = (rStyle : undefined | { [breakpoint: string]: any }) => {
+  if (!rStyle) return {
+    initialBreakpoint: undefined,
+    cleanedResponsiveStyle: rStyle,
+  };
+  let initial;
+  const responsiveStyle = Object.assign({}, rStyle);
+  for (let key in rStyle) {
+    if (responsiveStyle[key].initial && !initial) {
+      initial = key;
+    }
+    delete responsiveStyle[key].initial;
+  }
+  return {
+    initialBreakpoint: initial,
+    cleanedResponsiveStyle: responsiveStyle,
+  }
+}
+
 export const useCombineStyle = ({ theme, rStyle, computedStyle, style, propsStyle } : IUseCompbineStyle) => {
   const [currentTheme] = useThemeContext();
-  // @ts-ignore
-  const breakpoint = useWindowWidthBreakpoint(Object.keys(rStyle || {}));
 
-  const responsiveStyle = rStyle && rStyle[breakpoint] ? rStyle[breakpoint] : {};
+  const {
+    initialBreakpoint,
+    cleanedResponsiveStyle,
+  } = findInitial(rStyle);
+  // @ts-ignore
+  const breakpoint = useWindowWidthBreakpoint(Object.keys(rStyle || {}), initialBreakpoint);
+
+  const responsiveStyle = cleanedResponsiveStyle && cleanedResponsiveStyle[breakpoint] ? cleanedResponsiveStyle[breakpoint] : {};
 
   const allStyle = Array.isArray(style) ? [
     (theme ? theme[currentTheme] : {}),

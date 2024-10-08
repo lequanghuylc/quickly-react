@@ -92,7 +92,7 @@ function throttle(fn, threshhold, scope) {
   };
 }
 
-export const useWindowWidthBreakpoint = (accepts : Array<TOneBreakpoint> = allBreakpoints) : TOneBreakpoint => {
+export const useWindowWidthBreakpoint = (accepts : Array<TOneBreakpoint> = allBreakpoints, forceInitial : any) : TOneBreakpoint => {
   const ruleObject = (() => {
     const allRule : IResponsiveRule<TOneBreakpoint> = {
       xs: 'xs',
@@ -118,7 +118,7 @@ export const useWindowWidthBreakpoint = (accepts : Array<TOneBreakpoint> = allBr
     return getResponsiveRule(Dimensions.get('window').width, ruleObject);
   }
 
-  const [breakpoint, getCurrentBreakpoint, setBreakpoint] = useRefState<TOneBreakpoint>(measureBreakpointFromWidth());
+  const [breakpoint, getCurrentBreakpoint, setBreakpoint] = useRefState<TOneBreakpoint>(forceInitial || measureBreakpointFromWidth());
 
   const updateBreakpoint = throttle(() => {
     const newBreakpoint = measureBreakpointFromWidth();
@@ -128,6 +128,7 @@ export const useWindowWidthBreakpoint = (accepts : Array<TOneBreakpoint> = allBr
   }, 300, undefined);
 
   useEffect(() => {
+    if (accepts.length === 0) return;
     const unsubcription = Dimensions.addEventListener('change', updateBreakpoint);
     return () => {
       if (typeof Dimensions.removeEventListener === 'function') {
@@ -139,6 +140,6 @@ export const useWindowWidthBreakpoint = (accepts : Array<TOneBreakpoint> = allBr
         unsubcription.remove();
       }
     };
-  }, []);
+  }, [accepts]);
   return breakpoint;
 };

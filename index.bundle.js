@@ -171,7 +171,7 @@ function throttle(fn, threshhold, scope) {
         }
     };
 }
-var useWindowWidthBreakpoint = function (accepts) {
+var useWindowWidthBreakpoint = function (accepts, forceInitial) {
     if (accepts === void 0) { accepts = allBreakpoints; }
     var ruleObject = (function () {
         var allRule = {
@@ -197,7 +197,7 @@ var useWindowWidthBreakpoint = function (accepts) {
             return "c-".concat(currentWindowWidth);
         return getResponsiveRule(Dimensions.get('window').width, ruleObject);
     };
-    var _a = useRefState(measureBreakpointFromWidth()), breakpoint = _a[0], getCurrentBreakpoint = _a[1], setBreakpoint = _a[2];
+    var _a = useRefState(forceInitial || measureBreakpointFromWidth()), breakpoint = _a[0], getCurrentBreakpoint = _a[1], setBreakpoint = _a[2];
     var updateBreakpoint = throttle(function () {
         var newBreakpoint = measureBreakpointFromWidth();
         if (newBreakpoint !== getCurrentBreakpoint()) {
@@ -205,6 +205,8 @@ var useWindowWidthBreakpoint = function (accepts) {
         }
     }, 300);
     React.useEffect(function () {
+        if (accepts.length === 0)
+            return;
         var unsubcription = Dimensions.addEventListener('change', updateBreakpoint);
         return function () {
             if (typeof Dimensions.removeEventListener === 'function') {
@@ -214,15 +216,35 @@ var useWindowWidthBreakpoint = function (accepts) {
                 unsubcription.remove();
             }
         };
-    }, []);
+    }, [accepts]);
     return breakpoint;
 };
 
+var findInitial = function (rStyle) {
+    if (!rStyle)
+        return {
+            initialBreakpoint: undefined,
+            cleanedResponsiveStyle: rStyle,
+        };
+    var initial;
+    var responsiveStyle = Object.assign({}, rStyle);
+    for (var key in rStyle) {
+        if (responsiveStyle[key].initial && !initial) {
+            initial = key;
+        }
+        delete responsiveStyle[key].initial;
+    }
+    return {
+        initialBreakpoint: initial,
+        cleanedResponsiveStyle: responsiveStyle,
+    };
+};
 var useCombineStyle = function (_a) {
     var theme = _a.theme, rStyle = _a.rStyle, computedStyle = _a.computedStyle, style = _a.style, propsStyle = _a.propsStyle;
     var currentTheme = useThemeContext()[0];
-    var breakpoint = useWindowWidthBreakpoint(Object.keys(rStyle || {}));
-    var responsiveStyle = rStyle && rStyle[breakpoint] ? rStyle[breakpoint] : {};
+    var _b = findInitial(rStyle), initialBreakpoint = _b.initialBreakpoint, cleanedResponsiveStyle = _b.cleanedResponsiveStyle;
+    var breakpoint = useWindowWidthBreakpoint(Object.keys(rStyle || {}), initialBreakpoint);
+    var responsiveStyle = cleanedResponsiveStyle && cleanedResponsiveStyle[breakpoint] ? cleanedResponsiveStyle[breakpoint] : {};
     var allStyle = Array.isArray(style) ? __spreadArray([
         (theme ? theme[currentTheme] : {}),
         responsiveStyle,
