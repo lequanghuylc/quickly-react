@@ -32,7 +32,7 @@ export const getResponsiveRule : IGetResponsiveRule<any> = (viewportWidth, rules
     for (let customBreakpoint in rules) {
       if (typeof minWidthBreakpoints[customBreakpoint] === 'number') continue;
       if (!customBreakpoint.includes('px')) continue; // skip invalid breakpoint
-      const breakpointWidth = +customBreakpoint.replace('px', '');
+      const breakpointWidth = +(customBreakpoint.replace('px', '').replace('c', ''));
       if (isNaN(breakpointWidth)) continue; // skip invalid breakpoint
       minWidthBreakpoints[customBreakpoint] = breakpointWidth;
     }
@@ -105,7 +105,7 @@ export const useWindowWidthBreakpoint = (accepts : Array<TOneBreakpoint> = allBr
     };
     const obj : IResponsiveRule<TOneBreakpoint> = {};
     accepts.forEach(key => {
-      if (!!allRule[key] || key.includes('px')) {
+      if (!!allRule[key] || key.includes('px') || key.startsWith('c')) {
         obj[key] = key;
       }
     });

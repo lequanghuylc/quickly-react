@@ -122,7 +122,7 @@ var getResponsiveRule = function (viewportWidth, rules) {
             continue;
         if (!customBreakpoint.includes('px'))
             continue;
-        var breakpointWidth = +customBreakpoint.replace('px', '');
+        var breakpointWidth = +(customBreakpoint.replace('px', '').replace('c', ''));
         if (isNaN(breakpointWidth))
             continue;
         minWidthBreakpoints[customBreakpoint] = breakpointWidth;
@@ -185,7 +185,7 @@ var useWindowWidthBreakpoint = function (accepts, forceInitial) {
         };
         var obj = {};
         accepts.forEach(function (key) {
-            if (!!allRule[key] || key.includes('px')) {
+            if (!!allRule[key] || key.includes('px') || key.startsWith('c')) {
                 obj[key] = key;
             }
         });
@@ -716,6 +716,13 @@ var createGrid = function (Col, Row) {
             for (var key in props) {
                 if (allBreakpoints.includes(key)) {
                     accepts.push(key);
+                }
+                if (key.startsWith('c')) {
+                    var withoutC = key.slice(1);
+                    var isNumber = !isNaN(Number(withoutC));
+                    if (isNumber) {
+                        accepts.push(key);
+                    }
                 }
             }
             return accepts.length === 0 ? allBreakpoints : accepts;

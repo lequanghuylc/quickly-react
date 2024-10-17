@@ -23,6 +23,13 @@ export const createGrid = <TRow,>(Col : any, Row : any) => {
                 if (allBreakpoints.includes(key)) {
                     accepts.push(key);
                 }
+                if (key.startsWith('c')) {
+                    const withoutC = key.slice(1);
+                    const isNumber = !isNaN(Number(withoutC));
+                    if (isNumber) {
+                        accepts.push(key);
+                    }
+                }
             }
             return accepts.length === 0 ? allBreakpoints : accepts;
         })();
