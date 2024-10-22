@@ -708,7 +708,7 @@ var addCommonStyles = function (quickComponentInstact, cStyles, tokens) {
 
 var createGrid = function (Col, Row) {
     var Grid = function (_a) {
-        var children = _a.children, props = __rest(_a, ["children"]);
+        var children = _a.children, initial = _a.initial, props = __rest(_a, ["children", "initial"]);
         var uniqueId = React.useState('responsive_id_' + Math.random())[0];
         var breakpointAccepts = (function () {
             var accepts = [];
@@ -727,7 +727,7 @@ var createGrid = function (Col, Row) {
             }
             return accepts.length === 0 ? allBreakpoints : accepts;
         })();
-        var breakpoint = useWindowWidthBreakpoint(breakpointAccepts);
+        var breakpoint = useWindowWidthBreakpoint(breakpointAccepts, initial);
         var responsiveRule = props[breakpoint];
         var renderChildren = function () {
             var _a;
