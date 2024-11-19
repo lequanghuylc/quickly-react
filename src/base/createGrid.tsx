@@ -11,10 +11,11 @@ export interface IGridProps {
     xxxl?: string;
     children?: any;
     initial?: string;
+    debug?: boolean;
 }
 
 export const createGrid = <TRow,>(Col : any, Row : any) => {
-    const Grid = ({ children, initial, ...props }: IGridProps & TRow) => {
+    const Grid = ({ children, initial, debug, ...props }: IGridProps & TRow) => {
         const [uniqueId] = useState('responsive_id_' + Math.random());
 
         const breakpointAccepts = (() => {
@@ -34,10 +35,13 @@ export const createGrid = <TRow,>(Col : any, Row : any) => {
             }
             return accepts.length === 0 ? allBreakpoints : accepts;
         })();
+        if (debug) console.log('Grid breakpointAccepts', breakpointAccepts);
 
         const breakpoint = useWindowWidthBreakpoint(breakpointAccepts as Array<TOneBreakpoint>, initial);
 
         const responsiveRule = props[breakpoint];
+        
+        if (debug) console.log('Grid breakpoint', breakpoint, 'responsiveRule', responsiveRule);
 
         const renderChildren = () => {
             if (!responsiveRule) return children;

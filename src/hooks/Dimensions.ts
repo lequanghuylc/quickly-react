@@ -7,11 +7,11 @@ export let Dimensions = {
     };
   },
   addEventListener: (event: 'change', callback: any) => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || typeof window.addEventListener !== 'function') return;
     window.addEventListener('resize', callback);
   },
   removeEventListener: (event: 'change', callback: any) => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || typeof window.addEventListener !== 'function') return;
     window.removeEventListener('resize', callback);
   },
 }
