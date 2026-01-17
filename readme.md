@@ -36,6 +36,15 @@ Reactjs
 yarn add react-native-web quickly-react
 ```
 
+## Test Playground
+
+Want to test and debug your prop configurations? Check out the **[Test Playground](./playground.html)** - a browser-based tool that lets you:
+- Write your prop configurations in JSON
+- Input component props
+- See computed props and styles in real-time
+
+Simply open `playground.html` in your browser or [read the playground guide](./PLAYGROUND.md) for more details.
+
 ## Main idea & usage
 
 Controlling props is the main idea.
