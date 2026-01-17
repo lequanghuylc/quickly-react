@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quickly React - Test Playground</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-left {
+            border-right: 2px solid #e0e0e0;
+        }
+
+        .panel-header {
+            background-color: #f5f5f5;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #555;
+        }
+
+        textarea, .output-box {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            resize: vertical;
+        }
+
+        textarea {
+            padding: 12px;
+            min-height: 120px;
+            background-color: #fafafa;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+            background-color: #fff;
+        }
+
+        .output-box {
+            padding: 15px;
+            background-color: #f9f9f9;
+            min-height: 150px;
+            max-height: 400px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .button-container {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button:active {
+            background-color: #3d8b40;
+        }
+
+        .btn-secondary {
+            background-color: #2196F3;
+        }
+
+        .btn-secondary:hover {
+            background-color: #0b7dda;
+        }
+
+        .output-section {
+            margin-bottom: 25px;
+        }
+
+        .output-section h3 {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .error {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 4px solid #d32f2f;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .success {
+            color: #2e7d32;
+            background-color: #e8f5e9;
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 4px solid #2e7d32;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        pre {
+            margin: 0;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="panel panel-left">
+            <div class="panel-header">
+                <span class="title">⚙️ Input Configuration</span>
+            </div>
+            <div class="panel-content">
+                <div class="input-section">
+                    <label class="input-label">Props Configuration (JSON)</label>
+                    <textarea id="propsConfig"></textarea>
+                    <div class="help-text">
+                        Define your custom props with style, rStyle, theme, and props properties
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <label class="input-label">Component Props (JSON)</label>
+                    <textarea id="jsxInput"></textarea>
+                    <div class="help-text">
+                        Input the props you want to apply to your component
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <label class="input-label">Default Props (JSON Array)</label>
+                    <textarea id="defaultPropsInput" style="min-height: 60px;"></textarea>
+                    <div class="help-text">
+                        Props that will be applied by default to all components
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="detectStyleProps" />
+                        <span class="input-label" style="margin: 0;">Detect Style Props</span>
+                    </label>
+                    <div class="help-text">
+                        When enabled, allows passing style properties directly as props (e.g., marginTop, color)
+                    </div>
+                </div>
+
+                <div class="button-container">
+                    <button id="computeBtn">🔍 Compute Props & Styles</button>
+                    <button class="btn-secondary" id="example1Btn">Example 1</button>
+                    <button class="btn-secondary" id="example2Btn">Example 2</button>
+                </div>
+
+                <div id="errorDiv" class="error" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span class="title">📊 Computed Output</span>
+            </div>
+            <div class="panel-content">
+                <div id="outputDiv">
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999; font-size: 16px; text-align: center; padding: 40px">
+                        <div>
+                            <div style="font-size: 48px; margin-bottom: 20px">🎮</div>
+                            <div>Configure your props and component on the left,<br/>then click "Compute Props & Styles" to see the output here.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // QuickComponent implementation for the playground
+        class QuickComponent {
+            constructor() {
+                this.propsBank = {};
+                this.defaultProps = {};
+                this.shouldDetectStyleProps = false;
+            }
+
+            addProps(name, objProps) {
+                this.propsBank[name] = {
+                    name,
+                    ...objProps,
+                };
+                return this.propsBank[name];
+            }
+
+            setupDefaultProps(defaultArrayProps, options = {}) {
+                this.shouldDetectStyleProps = Boolean(options.shouldDetectStyleProps);
+                defaultArrayProps.forEach((v) => {
+                    this.defaultProps[v.name] = true;
+                });
+            }
+
+            _withoutStyle({ style, ...props }) {
+                return { ...props };
+            }
+
+            _combineProps(p) {
+                const combinedProps = {
+                    theme: Object.assign({}, p.theme),
+                    computedStyle: Object.assign({}, p.computedStyle),
+                    style: Array.isArray(p.style) ? p.style.slice() : Object.assign({}, p.style),
+                    rStyle: Object.assign({}, p.rStyle, p.props.rStyle),
+                    props: Object.assign({}, {
+                        ...this.defaultProps,
+                        ...p.props,
+                    }),
+                };
+
+                for (let key in combinedProps.props) {
+                    if (this.propsBank[key] && combinedProps.props[key] === true) {
+                        const bankData = this.propsBank[key];
+                        if (bankData.theme) {
+                            for (let themeValue in bankData.theme) {
+                                combinedProps.theme = combinedProps.theme || {};
+                                combinedProps.theme[themeValue] = {
+                                    ...combinedProps.theme[themeValue],
+                                    ...bankData.theme[themeValue],
+                                };
+                            }
+                        }
+                        if (bankData.style) {
+                            combinedProps.computedStyle = {
+                                ...combinedProps.computedStyle,
+                                ...bankData.style,
+                            };
+                        }
+                        if (bankData.rStyle) {
+                            for (let breakpoint in bankData.rStyle) {
+                                combinedProps.rStyle = combinedProps.rStyle || {};
+                                combinedProps.rStyle[breakpoint] = {
+                                    ...combinedProps.rStyle[breakpoint],
+                                    ...bankData.rStyle[breakpoint],
+                                };
+                            }
+                        }
+                        if (bankData.props) {
+                            combinedProps.props = {
+                                ...combinedProps.props,
+                                ...bankData.props,
+                            };
+                        }
+                        delete combinedProps.props[key];
+                    }
+                }
+                for (let key in combinedProps.props) {
+                    if (this.propsBank[key] && combinedProps.props[key] === true) 
+                        return this._combineProps(combinedProps);
+                }
+                return combinedProps;
+            }
+
+            computePropsAndStyles(inputProps) {
+                const combinedProps = this._combineProps({
+                    props: this._withoutStyle(inputProps),
+                    style: !inputProps.style ? {} : inputProps.style,
+                });
+
+                const { theme, rStyle, style, props, computedStyle } = combinedProps;
+                const propsStyle = this.shouldDetectStyleProps ? this._propsToStyle(props) : {};
+                
+                const combinedStyle = {
+                    ...computedStyle,
+                    ...propsStyle,
+                    ...(typeof style === 'object' && !Array.isArray(style) ? style : {}),
+                };
+
+                return {
+                    combinedProps,
+                    combinedStyle,
+                };
+            }
+
+            _propsToStyle(props) {
+                const styleProperties = ['alignContent', 'alignItems', 'alignSelf', 'aspectRatio', 
+                    'backgroundColor', 'borderRadius', 'borderWidth', 'color', 'display', 'flex', 
+                    'flexDirection', 'fontSize', 'fontWeight', 'height', 'justifyContent', 
+                    'margin', 'marginTop', 'marginBottom', 'marginLeft', 'marginRight',
+                    'padding', 'paddingTop', 'paddingBottom', 'paddingLeft', 'paddingRight',
+                    'textAlign', 'width', 'opacity', 'position', 'top', 'left', 'right', 'bottom'];
+                
+                let style = {};
+                for (let key in props) {
+                    if (styleProperties.includes(key)) {
+                        style[key] = props[key];
+                    }
+                }
+                return style;
+            }
+        }
+
+        // Application state
+        let state = {
+            propsConfig: `{
+  "bold": {
+    "style": {
+      "fontWeight": "bold"
+    }
+  },
+  "h1": {
+    "props": {
+      "bold": true
+    },
+    "rStyle": {
+      "md": {
+        "fontSize": 30
+      },
+      "xs": {
+        "fontSize": 24
+      }
+    }
+  },
+  "body": {
+    "rStyle": {
+      "md": {
+        "fontSize": 16
+      },
+      "xs": {
+        "fontSize": 14
+      }
+    }
+  },
+  "colorMain": {
+    "theme": {
+      "light": {
+        "color": "black"
+      },
+      "dark": {
+        "color": "white"
+      }
+    }
+  }
+}`,
+            jsxInput: `{
+  "h1": true,
+  "marginTop": 20,
+  "textAlign": "center"
+}`,
+            defaultPropsInput: `["body", "colorMain"]`,
+            detectStyleProps: true,
+            result: null,
+            error: null
+        };
+
+        let elements = {};
+
+        function initElements() {
+            elements = {
+                propsConfig: document.getElementById('propsConfig'),
+                jsxInput: document.getElementById('jsxInput'),
+                defaultPropsInput: document.getElementById('defaultPropsInput'),
+                detectStyleProps: document.getElementById('detectStyleProps'),
+                computeBtn: document.getElementById('computeBtn'),
+                example1Btn: document.getElementById('example1Btn'),
+                example2Btn: document.getElementById('example2Btn'),
+                errorDiv: document.getElementById('errorDiv'),
+                outputDiv: document.getElementById('outputDiv')
+            };
+        }
+
+        function render() {
+            if (state.error) {
+                elements.errorDiv.style.display = 'block';
+                elements.errorDiv.innerHTML = '<strong>Error:</strong> ' + state.error;
+            } else {
+                elements.errorDiv.style.display = 'none';
+            }
+
+            if (state.result) {
+                elements.outputDiv.innerHTML = `
+                    <div class="success">
+                        ✓ Props and styles computed successfully!
+                    </div>
+
+                    <div class="output-section">
+                        <h3>Combined Props</h3>
+                        <div class="output-box">
+                            <pre>${JSON.stringify(state.result.combinedProps, null, 2)}</pre>
+                        </div>
+                    </div>
+
+                    <div class="output-section">
+                        <h3>Combined Style</h3>
+                        <div class="output-box">
+                            <pre>${JSON.stringify(state.result.combinedStyle, null, 2)}</pre>
+                        </div>
+                    </div>
+
+                    <div class="output-section">
+                        <h3>Responsive Styles (rStyle)</h3>
+                        <div class="output-box">
+                            <pre>${JSON.stringify(state.result.combinedProps.rStyle || {}, null, 2)}</pre>
+                        </div>
+                        <div class="help-text">
+                            These styles will be applied based on screen breakpoints (xs, sm, md, lg, xl, xxl, xxxl)
+                        </div>
+                    </div>
+
+                    <div class="output-section">
+                        <h3>Theme Styles</h3>
+                        <div class="output-box">
+                            <pre>${JSON.stringify(state.result.combinedProps.theme || {}, null, 2)}</pre>
+                        </div>
+                        <div class="help-text">
+                            These styles will be applied based on the active theme
+                        </div>
+                    </div>
+                `;
+            } else {
+                elements.outputDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999; font-size: 16px; text-align: center; padding: 40px">
+                        <div>
+                            <div style="font-size: 48px; margin-bottom: 20px">🎮</div>
+                            <div>Configure your props and component on the left,<br/>then click "Compute Props & Styles" to see the output here.</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function processComponent() {
+            try {
+                state.error = null;
+                
+                const propsConfigObj = JSON.parse(state.propsConfig);
+                const componentProps = JSON.parse(state.jsxInput);
+                const defaultPropsArray = JSON.parse(state.defaultPropsInput);
+
+                const qc = new QuickComponent();
+
+                const propSetups = [];
+                for (let propName in propsConfigObj) {
+                    const propSetup = qc.addProps(propName, propsConfigObj[propName]);
+                    if (defaultPropsArray.includes(propName)) {
+                        propSetups.push(propSetup);
+                    }
+                }
+
+                qc.setupDefaultProps(propSetups, {
+                    shouldDetectStyleProps: state.detectStyleProps
+                });
+
+                const computed = qc.computePropsAndStyles(componentProps);
+
+                state.result = computed;
+            } catch (err) {
+                state.error = err.message;
+                state.result = null;
+            }
+            render();
+        }
+
+        function loadExample1() {
+            state.propsConfig = `{
+  "bold": {
+    "style": {
+      "fontWeight": "bold"
+    }
+  },
+  "h1": {
+    "props": {
+      "bold": true
+    },
+    "style": {
+      "fontSize": 32
+    }
+  }
+}`;
+            state.jsxInput = `{
+  "h1": true,
+  "marginTop": 20
+}`;
+            state.defaultPropsInput = `[]`;
+            state.detectStyleProps = true;
+            updateInputs();
+        }
+
+        function loadExample2() {
+            state.propsConfig = `{
+  "primary": {
+    "style": {
+      "backgroundColor": "#2196F3",
+      "color": "white"
+    }
+  },
+  "rounded": {
+    "style": {
+      "borderRadius": 8
+    }
+  },
+  "large": {
+    "style": {
+      "padding": 16,
+      "fontSize": 18
+    }
+  }
+}`;
+            state.jsxInput = `{
+  "primary": true,
+  "rounded": true,
+  "large": true
+}`;
+            state.defaultPropsInput = `[]`;
+            state.detectStyleProps = false;
+            updateInputs();
+        }
+
+        function updateInputs() {
+            elements.propsConfig.value = state.propsConfig;
+            elements.jsxInput.value = state.jsxInput;
+            elements.defaultPropsInput.value = state.defaultPropsInput;
+            elements.detectStyleProps.checked = state.detectStyleProps;
+        }
+
+        function setupEventListeners() {
+            elements.propsConfig.addEventListener('input', (e) => {
+                state.propsConfig = e.target.value;
+            });
+            
+            elements.jsxInput.addEventListener('input', (e) => {
+                state.jsxInput = e.target.value;
+            });
+            
+            elements.defaultPropsInput.addEventListener('input', (e) => {
+                state.defaultPropsInput = e.target.value;
+            });
+            
+            elements.detectStyleProps.addEventListener('change', (e) => {
+                state.detectStyleProps = e.target.checked;
+            });
+            
+            elements.computeBtn.addEventListener('click', processComponent);
+            elements.example1Btn.addEventListener('click', loadExample1);
+            elements.example2Btn.addEventListener('click', loadExample2);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initElements();
+            updateInputs();
+            setupEventListeners();
+            render();
+        });
+    </script>
+</body>
+</html>
