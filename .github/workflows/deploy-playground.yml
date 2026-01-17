@@ -1,0 +1,124 @@
+name: Deploy Playground to GitHub Pages
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'playground.html'
+      - 'PLAYGROUND.md'
+      - '.github/workflows/deploy-playground.yml'
+
+permissions:
+  contents: write
+  pull-requests: write
+  pages: write
+  id-token: write
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Checkout gh-pages branch
+        id: checkout-gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+          fetch-depth: 0
+        continue-on-error: true
+
+      - name: Initialize gh-pages directory if needed
+        if: steps.checkout-gh-pages.outcome == 'failure'
+        run: |
+          mkdir -p gh-pages
+
+      - name: Setup deployment directory
+        run: |
+          # Create gh-pages directory if it doesn't exist
+          mkdir -p gh-pages/pr-${{ github.event.pull_request.number }}
+          
+          # Copy playground files
+          cp playground.html gh-pages/pr-${{ github.event.pull_request.number }}/index.html
+          cp PLAYGROUND.md gh-pages/pr-${{ github.event.pull_request.number }}/
+          
+          # Create or update index.html at root if it doesn't exist
+          if [ ! -f gh-pages/index.html ]; then
+            cat > gh-pages/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Quickly React - PR Previews</title>
+          </head>
+          <body>
+              <h1>Quickly React - PR Previews</h1>
+              <p>This site hosts preview deployments for pull requests.</p>
+              <p>Preview URLs follow the pattern: <code>/pr-{number}/</code></p>
+          </body>
+          </html>
+          EOF
+          fi
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gh-pages
+          keep_files: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Comment PR with preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const repo = context.repo.repo;
+            const owner = context.repo.owner;
+            const previewUrl = `https://${owner}.github.io/${repo}/pr-${prNumber}/`;
+            
+            const commentBody = `## 🎮 Playground Preview
+            
+            Your playground preview is ready! 🚀
+            
+            **Preview URL:** ${previewUrl}
+            
+            This preview will be updated automatically when you push new commits to this PR.
+            
+            > **Note:** It may take a few minutes for GitHub Pages to build and deploy the changes.`;
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number: prNumber,
+            });
+            
+            const existingComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('🎮 Playground Preview')
+            );
+            
+            if (existingComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existingComment.id,
+                body: commentBody,
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: prNumber,
+                body: commentBody,
+              });
+            }
