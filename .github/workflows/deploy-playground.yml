@@ -24,12 +24,18 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Checkout gh-pages branch
+        id: checkout-gh-pages
         uses: actions/checkout@v4
         with:
           ref: gh-pages
           path: gh-pages
           fetch-depth: 0
         continue-on-error: true
+
+      - name: Initialize gh-pages directory if needed
+        if: steps.checkout-gh-pages.outcome == 'failure'
+        run: |
+          mkdir -p gh-pages
 
       - name: Setup deployment directory
         run: |
