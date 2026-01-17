@@ -322,8 +322,9 @@
                     }
                 }
                 for (let key in combinedProps.props) {
-                    if (this.propsBank[key] && combinedProps.props[key] === true) 
+                    if (this.propsBank[key] && combinedProps.props[key] === true) {
                         return this._combineProps(combinedProps);
+                    }
                 }
                 return combinedProps;
             }
@@ -350,17 +351,37 @@
             }
 
             _propsToStyle(props) {
-                const styleProperties = ['alignContent', 'alignItems', 'alignSelf', 'aspectRatio', 
-                    'backgroundColor', 'borderRadius', 'borderWidth', 'color', 'display', 'flex', 
-                    'flexDirection', 'fontSize', 'fontWeight', 'height', 'justifyContent', 
-                    'margin', 'marginTop', 'marginBottom', 'marginLeft', 'marginRight',
-                    'padding', 'paddingTop', 'paddingBottom', 'paddingLeft', 'paddingRight',
-                    'textAlign', 'width', 'opacity', 'position', 'top', 'left', 'right', 'bottom'];
+                const styleProperties = ['alignContent', 'alignItems', 'alignSelf', 'aspectRatio', 'backfaceVisibility', 
+                    'backgroundColor', 'borderBottomColor', 'borderBottomLeftRadius', 'borderBottomRightRadius', 
+                    'borderBottomWidth', 'borderColor', 'borderLeftColor', 'borderLeftWidth', 'borderRadius', 
+                    'borderRightColor', 'borderRightWidth', 'borderStyle', 'borderTopColor', 'borderTopLeftRadius', 
+                    'borderTopRightRadius', 'borderTopWidth', 'borderWidth', 'bottom', 'color', 'decomposedMatrix', 
+                    'direction', 'display', 'elevation', 'flex', 'flexBasis', 'flexDirection', 'flexGrow', 'flexShrink', 
+                    'flexWrap', 'fontFamily', 'fontSize', 'fontStyle', 'fontVariant', 'fontWeight', 'height', 
+                    'includeFontPadding', 'justifyContent', 'left', 'letterSpacing', 'lineHeight', 'margin', 
+                    'marginBottom', 'marginHorizontal', 'marginLeft', 'marginRight', 'marginTop', 'marginVertical', 
+                    'maxHeight', 'maxWidth', 'minHeight', 'minWidth', 'opacity', 'overflow', 'overlayColor', 
+                    'padding', 'paddingBottom', 'paddingHorizontal', 'paddingLeft', 'paddingRight', 'paddingTop', 
+                    'paddingVertical', 'position', 'right', 'rotation', 'scaleX', 'scaleY', 'shadowColor', 
+                    'shadowOffset', 'shadowOpacity', 'shadowRadius', 'textAlign', 'textAlignVertical', 
+                    'textDecorationColor', 'textDecorationLine', 'textDecorationStyle', 'textShadowColor', 
+                    'textShadowOffset', 'textShadowRadius', 'tintColor', 'top', 'transform', 'transformMatrix', 
+                    'translateX', 'translateY', 'width', 'writingDirection', 'zIndex', 'gap', 'rowGap', 'columnGap'];
                 
                 let style = {};
                 for (let key in props) {
                     if (styleProperties.includes(key)) {
                         style[key] = props[key];
+                    } else if (/\d/.test(key)) {
+                        // Support numbered style properties like flex1 -> flex: 1
+                        let matchArr = key.match(/\d+/g);
+                        if (matchArr != null && matchArr.length === 1 && key.indexOf(matchArr[0]) === key.length - matchArr[0].length) {
+                            const numberValue = Number(matchArr[0]);
+                            const propertyValue = key.substring(0, key.indexOf(matchArr[0]));
+                            if (styleProperties.includes(propertyValue)) {
+                                style[propertyValue] = numberValue;
+                            }
+                        }
                     }
                 }
                 return style;
