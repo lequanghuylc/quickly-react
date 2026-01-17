@@ -1,0 +1,85 @@
+name: Deploy Playground to GitHub Pages
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'playground.html'
+      - 'PLAYGROUND.md'
+      - '.github/workflows/deploy-playground.yml'
+
+permissions:
+  contents: write
+  pull-requests: write
+  pages: write
+  id-token: write
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup deployment directory
+        run: |
+          mkdir -p public/pr-${{ github.event.pull_request.number }}
+          cp playground.html public/pr-${{ github.event.pull_request.number }}/index.html
+          cp PLAYGROUND.md public/pr-${{ github.event.pull_request.number }}/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          destination_dir: pr-${{ github.event.pull_request.number }}
+          keep_files: true
+
+      - name: Comment PR with preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const repo = context.repo.repo;
+            const owner = context.repo.owner;
+            const previewUrl = `https://${owner}.github.io/${repo}/pr-${prNumber}/`;
+            
+            const commentBody = `## 🎮 Playground Preview
+            
+            Your playground preview is ready! 🚀
+            
+            **Preview URL:** ${previewUrl}
+            
+            This preview will be updated automatically when you push new commits to this PR.
+            
+            > **Note:** It may take a few minutes for GitHub Pages to build and deploy the changes.`;
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number: prNumber,
+            });
+            
+            const existingComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('🎮 Playground Preview')
+            );
+            
+            if (existingComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existingComment.id,
+                body: commentBody,
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: prNumber,
+                body: commentBody,
+              });
+            }
