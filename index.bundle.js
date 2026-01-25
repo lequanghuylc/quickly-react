@@ -75,12 +75,12 @@ var Dimensions = {
         };
     },
     addEventListener: function (event, callback) {
-        if (typeof window === 'undefined')
+        if (typeof window === 'undefined' || typeof window.addEventListener !== 'function')
             return;
         window.addEventListener('resize', callback);
     },
     removeEventListener: function (event, callback) {
-        if (typeof window === 'undefined')
+        if (typeof window === 'undefined' || typeof window.addEventListener !== 'function')
             return;
         window.removeEventListener('resize', callback);
     },
@@ -708,7 +708,7 @@ var addCommonStyles = function (quickComponentInstact, cStyles, tokens) {
 
 var createGrid = function (Col, Row) {
     var Grid = function (_a) {
-        var children = _a.children, initial = _a.initial, props = __rest(_a, ["children", "initial"]);
+        var children = _a.children, initial = _a.initial, debug = _a.debug, props = __rest(_a, ["children", "initial", "debug"]);
         var uniqueId = React.useState('responsive_id_' + Math.random())[0];
         var breakpointAccepts = (function () {
             var accepts = [];
@@ -727,8 +727,12 @@ var createGrid = function (Col, Row) {
             }
             return accepts.length === 0 ? allBreakpoints : accepts;
         })();
+        if (debug)
+            console.log('Grid breakpointAccepts', breakpointAccepts);
         var breakpoint = useWindowWidthBreakpoint(breakpointAccepts, initial);
         var responsiveRule = props[breakpoint];
+        if (debug)
+            console.log('Grid breakpoint', breakpoint, 'responsiveRule', responsiveRule);
         var renderChildren = function () {
             var _a;
             if (!responsiveRule)

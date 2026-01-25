@@ -16,7 +16,21 @@ const hasNumber = (myString : string) : boolean => {
 type TPropStyle = {
   [key in TStyleProperty]? : unknown
 }
-export interface IProps extends TPropStyle {
+
+/** flex1 -> flex: 1, etc. Supported at runtime via propsToStyle hasNumber branch. */
+export interface IFlexNumberStyleProps {
+  flex1?: boolean;
+  flex2?: boolean;
+  flex3?: boolean;
+  flex4?: boolean;
+  flex5?: boolean;
+  flex6?: boolean;
+  flex7?: boolean;
+  flex8?: boolean;
+  flex9?: boolean;
+}
+
+export interface IProps extends TPropStyle, IFlexNumberStyleProps {
   [key : string]: unknown,
 }
 

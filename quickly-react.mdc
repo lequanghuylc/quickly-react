@@ -1,0 +1,327 @@
+# quickly-react Component Guidelines
+
+This project uses the `quickly-react` library for building React Native and React web components. Follow these guidelines when creating or modifying components.
+
+## Core Principles
+
+1. **Always use base components from quickly-react first**
+2. **Use React Native components when base components aren't sufficient**
+3. **Never use raw HTML elements** (div, span, p, etc.)
+
+## Base Components (quickly-react)
+
+The following base components are available and should be used for all layout and text:
+
+### Layout Components
+
+- **`Col`**: Vertical container (flexDirection: column)
+  - Use for: Vertical layouts, stacking elements
+  - Example: `<Col flex1 p4 round2 bgWhite>...</Col>`
+
+- **`Row`**: Horizontal container (flexDirection: row, alignItems: center by default)
+  - Use for: Horizontal layouts, side-by-side elements
+  - Example: `<Row gap={8} middle>...</Row>`
+
+- **`Grid`**: Responsive grid layout
+  - Use for: Responsive column layouts
+  - Example: `<Grid xs="1:1" md="1:1:1:1" gap={16}>...</Grid>`
+
+- **`RatioCol`**: Container with aspect ratio
+  - Use for: Maintaining aspect ratios (images, videos)
+  - Example: `<RatioCol ratio={16/9} width="100%">...</RatioCol>`
+
+### Text Component
+
+- **`Text`**: Text component with typography props
+  - Use for: All text content
+  - Example: `<Text h3 bold center>Heading</Text>`
+
+### Available Props
+
+Base components support these common props:
+
+**Spacing:**
+- `m0`-`m9`, `mt1`-`mt9`, `mb1`-`mb9`, `ml1`-`ml9`, `mr1`-`mr9`
+- `mv1`-`mv9` (vertical), `mh1`-`mh9` (horizontal)
+- `p0`-`p9`, `pt1`-`pt9`, `pb1`-`pb9`, `pl1`-`pl9`, `pr1`-`pr9`
+- `pv1`-`pv9`, `ph1`-`ph9`
+
+**Layout:**
+- `flex1`, `flex2`, `flex3`, etc. (flex: 1, 2, 3...)
+- `middle` (justifyContent: center, alignItems: center)
+- `width100p` (width: '100%')
+- `gap={number}` (gap between children)
+
+**Styling:**
+- `round0`, `round1`, `round1_5`, `round2` (borderRadius: 4, 8, 12, 16)
+- `shadow` (elevation + shadow)
+- `bgWhite`, `bgPrimary`, `bgSecondary`
+- `borderThin` (borderWidth: 1)
+
+**Style Props (direct style properties):**
+- `marginTop={20}`, `padding={16}`, `flex={1}`, `width={100}`, etc.
+
+**Text Props:**
+- Typography: `h1`, `h2`, `h3`, `h4`, `h5`, `h6`, `body`, `small`, `xsmall`
+- Weights: `bold`, `semiBold`, `medium`, `regular`
+- Alignment: `center`
+- Colors: `colorDefault`, `primary`, `secondary`
+
+## React Native Components (When Base Components Aren't Enough)
+
+When base components don't provide the needed functionality, use React Native components:
+
+### Allowed React Native Components
+
+- **`ScrollView`**: For scrollable content
+  - Use when: Content exceeds viewport, lists, forms
+  - Example: `<ScrollView style={{ flex: 1 }}>...</ScrollView>`
+
+- **`FlatList`**: For efficient list rendering
+  - Use when: Large lists, virtualized lists
+  - Example: `<FlatList data={items} renderItem={...} />`
+
+- **`Modal`**: For overlays and dialogs
+  - Use when: Dialogs, dropdowns, tooltips
+  - Example: `<Modal visible={open} transparent>...</Modal>`
+
+- **`TextInput`**: For text input fields
+  - Use when: Forms, search boxes, inputs
+  - Example: `<TextInput value={text} onChangeText={...} />`
+
+- **`Image`**: For images
+  - Use when: Displaying images
+  - Example: `<Image source={require('./image.png')} />`
+
+- **`Pressable`**: For custom pressable areas
+  - Use when: Base `Col` with `onPress` isn't sufficient
+  - Example: `<Pressable onPress={...}>...</Pressable>`
+
+- **`View`**: Only when absolutely necessary
+  - Use when: Base components truly can't handle the use case
+  - Prefer: `Col` or `Row` instead
+
+### Other React Native Components
+
+You may also use:
+- `ActivityIndicator` (loading spinners)
+- `Switch` (toggle switches)
+- `TouchableOpacity`, `TouchableHighlight` (if `Pressable` isn't available)
+- `Animated` components
+- Platform-specific components when needed
+
+## Forbidden: Raw HTML Elements
+
+**DO NOT USE:**
+- `<div>`, `<span>`, `<p>`, `<h1>`, `<h2>`, etc.
+- Any HTML elements
+- Web-only DOM elements
+
+**Reason:** This is a React Native project that should work on iOS, Android, and Web via React Native Web. HTML elements won't work on native platforms.
+
+## Component Creation Pattern
+
+When creating new components:
+
+1. **Start with base components:**
+   ```tsx
+   import { Col, Row, Text } from '@/components/base';
+   
+   export function MyComponent() {
+     return (
+       <Col p4 round2 bgWhite>
+         <Text h4 bold>Title</Text>
+         <Row gap={8}>
+           {/* content */}
+         </Row>
+       </Col>
+     );
+   }
+   ```
+
+2. **Add React Native components when needed:**
+   ```tsx
+   import { ScrollView } from 'react-native';
+   import { Col, Text } from '@/components/base';
+   
+   export function ScrollableContent() {
+     return (
+       <Col flex1>
+         <ScrollView>
+           <Text>Content</Text>
+         </ScrollView>
+       </Col>
+     );
+   }
+   ```
+
+3. **Use style props for quick styling:**
+   ```tsx
+   <Col 
+     flex1 
+     p4 
+     round2 
+     bgWhite 
+     shadow 
+     marginTop={20}
+     gap={12}
+   >
+     {/* Use props instead of StyleSheet when possible */}
+   </Col>
+   ```
+
+## Examples
+
+### ✅ Good: Using Base Components
+
+```tsx
+import { Col, Row, Text } from '@/components/base';
+
+export function Card({ title, children }) {
+  return (
+    <Col p4 round2 bgWhite shadow gap={12}>
+      <Text h4 bold>{title}</Text>
+      {children}
+    </Col>
+  );
+}
+```
+
+### ✅ Good: Base + React Native
+
+```tsx
+import { ScrollView } from 'react-native';
+import { Col, Text } from '@/components/base';
+
+export function ScrollableList() {
+  return (
+    <Col flex1>
+      <ScrollView>
+        <Text>Item 1</Text>
+        <Text>Item 2</Text>
+      </ScrollView>
+    </Col>
+  );
+}
+```
+
+### ❌ Bad: Using HTML Elements
+
+```tsx
+// DON'T DO THIS
+export function Card() {
+  return (
+    <div style={{ padding: 16 }}>
+      <h1>Title</h1>
+      <p>Content</p>
+    </div>
+  );
+}
+```
+
+### ❌ Bad: Using View When Col Would Work
+
+```tsx
+// DON'T DO THIS - use Col instead
+import { View } from 'react-native';
+
+export function Container() {
+  return <View style={{ flex: 1, padding: 16 }}>...</View>;
+}
+
+// DO THIS INSTEAD
+import { Col } from '@/components/base';
+
+export function Container() {
+  return <Col flex1 p4>...</Col>;
+}
+```
+
+## Import Pattern
+
+Always import base components from your base module:
+
+```tsx
+// ✅ Correct
+import { Col, Row, Text, Grid } from '@/components/base';
+import { ScrollView, Modal } from 'react-native';
+
+// ❌ Wrong
+import { View, Text as RNText } from 'react-native'; // Use base Text instead
+```
+
+## Responsive Layouts
+
+Use `Grid` component for responsive layouts. The Grid supports two patterns: **percentage-based** for equal columns, and **flex ratios** for stack layouts.
+
+### Percentage-Based Grid (Equal Columns)
+
+Use percentages when you want all items to have equal width:
+
+```tsx
+// 1 per row (xs) → 2 per row (sm) → 3 per row (md) → 4 per row (lg)
+<Grid xs="100%" sm="50%" md="33%" lg="25%" margin={-4}>
+  {Array.from({ length: 12 }, (_, i) => (
+    <Col key={i} margin={4} p3 round1 bgSecondary middle style={{ minHeight: 60 }}>
+      <Text center small bold>{i + 1}</Text>
+    </Col>
+  ))}
+</Grid>
+```
+
+**How spacing works:**
+- Use negative `margin` on `Grid` (e.g., `margin={-4}`)
+- Use positive `margin` on each child item (e.g., `margin={4}`)
+- Total spacing between items = 8 (4 + 4)
+
+**Breakpoint behavior:**
+- `xs="100%"` → 1 column per row (mobile)
+- `sm="50%"` → 2 columns per row (small tablets)
+- `md="33%"` → 3 columns per row (tablets)
+- `lg="25%"` → 4 columns per row (desktop)
+
+### Flex Ratios (Stack Layout)
+
+Use flex ratios (`1:2`, `1:3`, etc.) when items should have different proportions:
+
+```tsx
+// Vertical on mobile, horizontal with different proportions on larger screens
+<Grid xs="100%" md="1:2" lg="1:3">
+  <Col p3 round1 bgPrimary middle>
+    <Text center small>Profile Picture</Text>
+  </Col>
+  <Col p3 round1 bgSecondary middle>
+    <Text center small>Name & Details</Text>
+  </Col>
+</Grid>
+```
+
+**Breakpoint behavior:**
+- `xs="100%"` → Vertical stack (both items full width)
+- `md="1:2"` → Horizontal: first item 1/3 width, second item 2/3 width
+- `lg="1:3"` → Horizontal: first item 1/4 width, second item 3/4 width
+
+### Special Flex Patterns
+
+- `xs="1"` → Only first child visible (flex:1), others hidden (flex:0)
+- `sm="1:1"` → Only first two children visible (both flex:1), others hidden
+- `xs="1:."` → All children get flex:1 (equal flex distribution)
+
+### Custom Responsive Logic
+
+Or use `useWindowWidthBreakpoint` hook for custom responsive logic:
+
+```tsx
+import { useWindowWidthBreakpoint } from 'quickly-react';
+
+const breakpoint = useWindowWidthBreakpoint(['xs', 'sm', 'md', 'lg']);
+const isMobile = breakpoint === 'xs' || breakpoint === 'sm';
+```
+
+## Summary
+
+1. **Always prefer base components** (`Col`, `Row`, `Text`, `Grid`, `RatioCol`)
+2. **Use React Native components** (`ScrollView`, `Modal`, `FlatList`, `TextInput`, etc.) when base components aren't sufficient
+3. **Never use HTML elements** (`div`, `span`, `p`, etc.)
+4. **Use style props** (`p4`, `round2`, `gap={8}`, etc.) instead of StyleSheet when possible
+5. **Import from base module**: `import { Col, Row, Text } from '@/components/base'`

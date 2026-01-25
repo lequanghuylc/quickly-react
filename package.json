@@ -1,12 +1,13 @@
 {
   "name": "quickly-react",
-  "version": "0.4.18",
+  "version": "0.5.0",
   "description": "Quickly style react-native and reactjs components via props",
   "main": "index.bundle.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx rollup -c --bundleConfigAsCjs"
+    "build": "rollup -c --bundleConfigAsCjs && tsc --emitDeclarationOnly",
+    "postinstall": "node scripts/postinstall.js"
   },
   "keywords": [],
   "author": "Le Quang Huy <lequanghuylc@gmail.com>",
@@ -14,6 +15,7 @@
   "dependencies": {},
   "repository": "https://github.com/lequanghuylc/quickly-react",
   "devDependencies": {
+    "rollup": "^4.9.0",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.6",
@@ -22,6 +24,14 @@
     "tslib": "^2.6.3",
     "typescript": "^4.7.4"
   },
+  "files": [
+    "index.bundle.js",
+    "lib",
+    "quickly-react.mdc",
+    "scripts",
+    "readme.md",
+    "DESIGN_SYSTEM_GUIDE.md"
+  ],
   "publishConfig": {
     "access": "public"
   }

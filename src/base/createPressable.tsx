@@ -3,7 +3,7 @@ import QuickComponent from "../QuickComponent";
 import { useContainer } from "../index";
 
 export interface IPressableViewProps {
-    onPress?: () => any;
+    onPress?: ((event?: any) => any) | null;
     pressedStyle?: any;
     onRef?: any;
     style?: any;
