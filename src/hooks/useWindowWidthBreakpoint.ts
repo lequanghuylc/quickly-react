@@ -1,6 +1,8 @@
 import { Dimensions } from './Dimensions';
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { useRefState } from '../hooks/useRefState'
+
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 export interface IResponsiveRule<T> {
   xs?: T | undefined,
@@ -127,12 +129,15 @@ export const useWindowWidthBreakpoint = (accepts : Array<TOneBreakpoint> = allBr
     }
   }, 300, undefined);
 
-  useEffect(() => {
-    if (!forceInitial) return;
-    // this is a fix for nextjs, it requires the server and client to have the same initial value
-    // but we need to re-calculate the breakpoint on the client side
-    updateBreakpoint();
-  }, [forceInitial])
+  // SSR / hydration: initial state often matches width 0 (xs) or a forced `initialBreakpoint`.
+  // Re-measure from the real viewport before paint so layout (e.g. Grid) is correct immediately.
+  const acceptsKey = accepts.join();
+  useIsomorphicLayoutEffect(() => {
+    const newBreakpoint = measureBreakpointFromWidth();
+    if (newBreakpoint !== getCurrentBreakpoint()) {
+      setBreakpoint(newBreakpoint);
+    }
+  }, [acceptsKey, forceInitial]);
 
   useEffect(() => {
     if (accepts.length === 0) return;
