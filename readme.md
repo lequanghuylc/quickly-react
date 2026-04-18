@@ -214,6 +214,80 @@ Use flex ratios (`1:2`, `1:3`, etc.) when items should have different proportion
 - `sm="1:1"` → Only first two children visible (both flex:1), others hidden
 - `xs="1:."` → All children get flex:1 (equal flex distribution)
 
+### `any` in flex ratio strings
+
+In a ratio rule like `md="1:any"`, each segment maps to one child (in order). Numeric segments set `flex` to that number. The keyword **`any`** means “no numeric flex”: that column does not get a `flex` value from the grid rule, so it sizes from its content or from props you pass on the child (for example a fixed `width` on `Col`).
+
+```tsx
+<Grid gap={24} xs="100%" md="1:any">
+  <Col><Text>Flexible column</Text></Col>
+  <Col width={320}><Text>Fixed 320pt width</Text></Col>
+</Grid>
+```
+
+On `md` and up, the first column grows/shrinks with available space; the second stays driven by `width={320}` (and gap).
+
+### SSR / Next.js: `initial` breakpoint on `Grid`
+
+Responsive breakpoint for **`Grid`** is controlled by the **`initial`** prop (a breakpoint name: `xs`, `sm`, `md`, …). Use it so the first server render matches what you intend for hydration (often the narrow layout), then the client re-measures the real viewport before paint.
+
+This is **not** the same as the responsive-style **`initialBreakpoint`** pattern used inside `rStyle` / `useCombineStyle` (where a breakpoint entry can carry an `.initial` marker). On **`Grid`**, the prop name is **`initial`**.
+
+```tsx
+<Grid xs="100%" md="1:any" initial="md" gap={24}>
+  <Col>...</Col>
+  <Col width={320}>...</Col>
+</Grid>
+```
+
+Pick `initial` to align the first paint with your SSR strategy (for example `initial="xs"` if the server has no real width and you default to mobile markup).
+
+## Theme system (`ThemeProvider`, `useThemeContext`)
+
+The library exports a small theme context so components built with **`QuickComponent`** (or anything that uses **`useCombineStyle`**) can resolve `theme` entries from `addProps` against the **active theme name**.
+
+```tsx
+import { ThemeProvider, useThemeContext } from 'quickly-react';
+```
+
+### `ThemeProvider`
+
+Wrap your app (or a subtree). Optional prop **`initial`**: string **name of the active theme** (defaults to `'default'` in the context—use the same string as a key in your `theme` objects, e.g. `light` / `dark`). This is unrelated to the **`initial`** breakpoint prop on **`Grid`** (SSR), which is also a string but must be a breakpoint code like `md` or `xs`.
+
+```tsx
+<ThemeProvider initial="light">
+  <App />
+</ThemeProvider>
+```
+
+### `useThemeContext`
+
+Returns a tuple **`[currentThemeName, setTheme]`**, same shape as `useState`:
+
+- **`currentThemeName`**: string, e.g. `'light'` or `'dark'`.
+- **`setTheme`**: update the active theme (re-renders consumers and restyles components that depend on `theme` in `addProps`).
+
+```tsx
+const [theme, setTheme] = useThemeContext();
+// Toggle example
+setTheme(theme === 'light' ? 'dark' : 'light');
+```
+
+### How it ties to `addProps`
+
+In `addProps`, `theme` is an object whose keys are theme names and values are style objects merged when that theme is active:
+
+```tsx
+qC.addProps('colorMain', {
+  theme: {
+    light: { color: '#111' },
+    dark: { color: '#eee' },
+  },
+});
+```
+
+With `<ThemeProvider initial="light">`, `colorMain` resolves the `light` entry. Changing theme with `setTheme('dark')` switches to the `dark` styles. Name your themes consistently across `ThemeProvider` / `setTheme` and every `theme: { ... }` block in your design system.
+
 ## How to build a design system with this lib
 
 This lib only provide core functions, you will need to build up your component yourself. 

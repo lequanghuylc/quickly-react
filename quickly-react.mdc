@@ -24,7 +24,8 @@ The following base components are available and should be used for all layout an
 
 - **`Grid`**: Responsive grid layout
   - Use for: Responsive column layouts
-  - Example: `<Grid xs="1:1" md="1:1:1:1" gap={16}>...</Grid>`
+  - Examples: `<Grid xs="1:1" md="1:1:1:1" gap={16}>...</Grid>`, flex ratios with `any`: `<Grid xs="100%" md="1:any" initial="md" gap={24}>...</Grid>`
+  - **Next.js / SSR:** pass **`initial`** with a breakpoint name (`xs`, `sm`, `md`, …) so the first render matches your hydration strategy; the client then applies the real viewport width before paint. This prop is **`initial`** on `Grid`, not `initialBreakpoint` (that name is used elsewhere for responsive *styles* with an `.initial` marker in `rStyle`).
 
 - **`RatioCol`**: Container with aspect ratio
   - Use for: Maintaining aspect ratios (images, videos)
@@ -307,6 +308,21 @@ Use flex ratios (`1:2`, `1:3`, etc.) when items should have different proportion
 - `sm="1:1"` → Only first two children visible (both flex:1), others hidden
 - `xs="1:."` → All children get flex:1 (equal flex distribution)
 
+### `any` in flex ratio strings
+
+Rules like `md="1:any"` assign one segment per child. Numbers set `flex` on the generated `Col`. **`any`** skips numeric flex for that slot so the column sizes from content or from props on the child (e.g. `width={320}` on `Col`).
+
+```tsx
+<Grid gap={24} xs="100%" md="1:any" initial="md">
+  <Col><Text>Hello</Text></Col>
+  <Col width={320}><Text>Hello 2</Text></Col>
+</Grid>
+```
+
+### SSR / Next.js: `initial` on `Grid`
+
+Use the **`initial`** prop (breakpoint name) on `Grid` for server/client alignment. It is not the same as **`initialBreakpoint`** used with responsive *style* objects in `useCombineStyle` / `rStyle`.
+
 ### Custom Responsive Logic
 
 Or use `useWindowWidthBreakpoint` hook for custom responsive logic:
@@ -318,6 +334,17 @@ const breakpoint = useWindowWidthBreakpoint(['xs', 'sm', 'md', 'lg']);
 const isMobile = breakpoint === 'xs' || breakpoint === 'sm';
 ```
 
+## Theme system (`ThemeProvider`, `useThemeContext`)
+
+```tsx
+import { ThemeProvider, useThemeContext } from 'quickly-react';
+```
+
+- **`ThemeProvider`**: Wrap the app (or a section). Optional **`initial`**: string **theme name** (context defaults to `'default'`—align with keys in `addProps` `theme`, e.g. `light` / `dark`). Do not confuse with **`Grid`**’s **`initial`** prop, which is a **breakpoint** name for SSR (`xs`, `md`, …).
+- **`useThemeContext()`**: Returns **`[themeName, setTheme]`**. Use `setTheme('dark')` (etc.) to switch themes; components that merge `theme` via `QuickComponent` / `useCombineStyle` pick styles from `theme[themeName]`.
+
+Ensure every `theme` block in your props bank uses the same theme names you set on the provider and when calling `setTheme`.
+
 ## Summary
 
 1. **Always prefer base components** (`Col`, `Row`, `Text`, `Grid`, `RatioCol`)
@@ -325,3 +352,5 @@ const isMobile = breakpoint === 'xs' || breakpoint === 'sm';
 3. **Never use HTML elements** (`div`, `span`, `p`, etc.)
 4. **Use style props** (`p4`, `round2`, `gap={8}`, etc.) instead of StyleSheet when possible
 5. **Import from base module**: `import { Col, Row, Text } from '@/components/base'`
+6. **Grid + Next.js:** use the **`initial`** breakpoint prop on `Grid` when you need SSR/hydration alignment; flex ratios may use **`any`** for columns that should not receive numeric `flex` from the rule (e.g. fixed-width columns).
+7. **Themes:** wrap the tree with **`ThemeProvider`**, read or switch the active theme with **`useThemeContext`**, and keep `addProps` `theme` keys in sync with those names.
