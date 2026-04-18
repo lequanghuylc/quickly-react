@@ -107,6 +107,7 @@ var useRefState = function (initialValue) {
     ];
 };
 
+var useIsomorphicLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
 var minWidthBreakpoints = {
     xs: 0,
     sm: 576,
@@ -204,11 +205,13 @@ var useWindowWidthBreakpoint = function (accepts, forceInitial) {
             setBreakpoint(newBreakpoint);
         }
     }, 300);
-    React.useEffect(function () {
-        if (!forceInitial)
-            return;
-        updateBreakpoint();
-    }, [forceInitial]);
+    var acceptsKey = accepts.join();
+    useIsomorphicLayoutEffect(function () {
+        var newBreakpoint = measureBreakpointFromWidth();
+        if (newBreakpoint !== getCurrentBreakpoint()) {
+            setBreakpoint(newBreakpoint);
+        }
+    }, [acceptsKey, forceInitial]);
     React.useEffect(function () {
         if (accepts.length === 0)
             return;
